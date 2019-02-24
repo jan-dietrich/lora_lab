@@ -28,9 +28,9 @@
 #define LORA_DIO2                       32
 
 // LoRa TX interval in seconds. Needs to be compliant to fair use policy. May become longer due to duty cycle restrictions
-#define TX_INTERVAL                     60 
+#define TX_INTERVAL                     45 
 
-#define PAYLOAD_BUFFER_SIZE             51      // maximum size of payload block per transmit
+#define PAYLOAD_BUFFER_SIZE             50      // maximum size of payload block per transmit
 #define SEND_QUEUE_SIZE                 10       // maximum number of messages in payload send queue [1 = no queue]
 #define SEND_BUFFER_SIZE                50
 

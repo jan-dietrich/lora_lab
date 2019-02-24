@@ -21,13 +21,13 @@ static const char TAG[] = "main";
 void setup() {
 
 // enable serial monitor if log level is high enough
-#ifdef LOG_LEVEL > 0
+#if LOG_LEVEL > 0
 Serial.begin(115200);
 Serial.printf("%s:Serial monitor enabled\n", TAG);
 Serial.printf("%s:Debugging Level is set to: %i\n",TAG, LOG_LEVEL);
 #endif
 
-#ifdef LOG_LEVEL > 2
+#if LOG_LEVEL > 2
 Serial.printf("%s:Currently running %s in version %s\n",TAG, ESPNAME, PROGVERSION);
 #endif
 
@@ -46,10 +46,10 @@ memcpy(SendBuffer.Message, mydata, SendBuffer.MessageSize);
 
 lora_setabpkeys(NWKSKEY,APPSKEY,DEVADDR);
 
-xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 2048, ( void * ) 1, ( 5 | portPRIVILEGE_BIT ), NULL, 1);
-//assert(lora_initialize() == ESP_OK);
+xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 2048, NULL, 5, NULL, 1);
+//lora_initialize(NULL);
 
-#ifdef LOG_LEVEL > 2
+#if LOG_LEVEL > 2
 Serial.printf("%s:Trying to que data now...\n", TAG);
 #endif
 
@@ -57,5 +57,5 @@ lora_enqueuedata(&SendBuffer);
 }
 
 void loop() {
-  
+    
 }

@@ -49,7 +49,7 @@ void lora_setabpkeys(u1_t NSK[16], u1_t ASK[16], u4_t DEVADDR){
     ASK = ASK;
     DEVADDR = DEVADDR;
 
-    #ifdef LOG_LEVEL > 3
+    #if LOG_LEVEL > 3
         Serial.printf("%S:Network Session Key set to %u\n", TAG, NSK);
         Serial.printf("%S:Application Session Key set to %u\n", TAG, ASK);
         Serial.printf("%S:Device Address set to %u\n", TAG, DEVADDR);
@@ -60,11 +60,11 @@ void lora_setabpkeys(u1_t NSK[16], u1_t ASK[16], u4_t DEVADDR){
 void lora_initialize(void * parameter){
     LoraSendQueue = xQueueCreate(SEND_QUEUE_SIZE, sizeof(MessageBuffer_t));
     if (LoraSendQueue == 0) {
-        #ifdef LOG_LEVEL > 0 
+        #if LOG_LEVEL > 0 
             Serial.printf("%s:Could not create que. Aborting ...\n",TAG);
         #endif
     }
-    #ifdef LOG_LEVEL > 2
+    #if LOG_LEVEL > 2
         Serial.printf("%s:LORA send queue created, size %d Bytes\n",TAG,SEND_QUEUE_SIZE * PAYLOAD_BUFFER_SIZE);
         Serial.printf("%s:Initializing LMIC instance\n", TAG);
     #endif
@@ -78,12 +78,11 @@ void lora_initialize(void * parameter){
     //Set session
     if ((NSK != 0 ) & (ASK != 0) & (DEVADDR != 0)){
     LMIC_setSession (0x1, DEVADDR, NSK, ASK);
-    #ifdef LOG_LEVEL > 2 
+    #if LOG_LEVEL > 2 
         Serial.printf("%s:Set LMIC session parameters successfully\n",TAG);
     #endif
-    } else
-    {
-        #ifdef LOG_LEVEL > 0
+    } else {
+        #if LOG_LEVEL > 0
             Serial.printf("%s:Could not set LMIC session parameters\n",TAG);
             Serial.printf("%S:Network Session Key is %u\n", TAG, NSK);
             Serial.printf("%S:Application Session Key is %u\n", TAG, ASK);
@@ -114,26 +113,26 @@ void lora_send(osjob_t *job) {
   MessageBuffer_t SendBuffer;
   // Check if there is a pending TX/RX job running, if yes don't eat data
   // since it cannot be sent right now
-  if ((LMIC.opmode & (OP_JOINING | OP_REJOIN | OP_TXDATA | OP_POLL)) != 0) {
+  if (LMIC.opmode & OP_TXRXPEND) {
     // waiting for LoRa getting ready
-    #ifdef LOG_LEVEL > 1
-        Serial.printf("%s:Could not send data to LoRa Gateway. LMIC is busy\n", TAG);
-        Serial.printf("%s:Opcode is: %d\n", TAG, LMIC.opmode);
+    #if LOG_LEVEL > 1
+        Serial.printf("%s:OP_TXRXPEND, could not send data to LoRa Gateway. LMIC is busy\n", TAG);
+        Serial.printf("%s:Opcode is: %x\n", TAG, LMIC.opmode);
     #endif
   } else {
-    #ifdef LOG_LEVEL > 2
+    #if LOG_LEVEL > 2
     Serial.printf("%s:Sendjob startet: Checking que\n", TAG);
     #endif
     if (xQueueReceive(LoraSendQueue, &SendBuffer, (TickType_t)0) == pdTRUE) {
       // SendBuffer now filled with next payload from queue
       LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
-        #ifdef LOG_LEVEL > 2
+        #if LOG_LEVEL > 2
         Serial.printf("%s:%d byte(s) sent to LoRa\n",TAG, SendBuffer.MessageSize);
         Serial.printf("%s:Transmitted message: %s\n",TAG,SendBuffer.Message);
         #endif
     }
     else {
-        #ifdef LOG_LEVEL > 1
+        #if LOG_LEVEL > 1
             Serial.printf("%s:Warning! No entries in que\n",TAG);
         #endif
     }
@@ -144,7 +143,7 @@ void lora_send(osjob_t *job) {
 }
 
 void onEvent (ev_t ev) {
-    #ifdef LOG_LEVEL > 2
+    #if LOG_LEVEL > 2
     Serial.printf("%s:Event received @:%s",TAG,os_getTime());
     #endif
 
@@ -215,11 +214,11 @@ void lora_enqueuedata(MessageBuffer_t *message) {
     ret = xQueueSendToBack(LoraSendQueue, (void *)message, (TickType_t)0);
 
   if (ret == pdTRUE) {
-      #ifdef LOG_LEVEL > 2
+      #if LOG_LEVEL > 2
       Serial.printf("%s:%d bytes enqueued for LORA interface\n", TAG, message->MessageSize);
       #endif
   } else {
-      #ifdef LOG_LEVEL > 1
+      #if LOG_LEVEL > 1
       Serial.printf("%s:LoRa sendque is full\n", TAG);
       #endif
   }
