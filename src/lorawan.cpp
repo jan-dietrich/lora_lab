@@ -142,9 +142,9 @@ void lora_send(osjob_t *job) {
   os_setTimedCallback(job, os_getTime()+sec2osticks(TX_INTERVAL) ,lora_send);
 }
 
-void onEvent (ev_t ev) {
+void onEvent(ev_t ev) {
     #if LOG_LEVEL > 2
-    Serial.printf("%s:Event received @:%s",TAG,os_getTime());
+    Serial.printf("%s:Event received @:%d",TAG,os_getTime());
     #endif
 
     // depending on event

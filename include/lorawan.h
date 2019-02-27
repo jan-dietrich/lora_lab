@@ -28,7 +28,7 @@ void lora_setotaakeys(u1_t APPEUI[8], u1_t DEVEUI[8], u1_t APPKEY[16]);
 
 // gets called on event from LMIC
 // name can not be changed as LMIC is not working otherwise
-void onEvent (ev_t ev);
+void onEvent(ev_t ev);
 
 // starts uplink to network server. Should not be called. Instead use lora_enquedata
 void lora_send(osjob_t* j);
