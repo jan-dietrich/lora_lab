@@ -144,66 +144,98 @@ void lora_send(osjob_t *job) {
 
 void onEvent(ev_t ev) {
     #if LOG_LEVEL > 2
-    Serial.printf("%s:Event received @:%d",TAG,os_getTime());
+    Serial.printf("%s:Event received @:%d\n",TAG,os_getTime());
     #endif
 
     // depending on event
     switch(ev) {
         case EV_SCAN_TIMEOUT:
-            Serial.println(F("EV_SCAN_TIMEOUT"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_SCAN_TIMEOUT\n", TAG);
+            #endif
             break;
         case EV_BEACON_FOUND:
-            Serial.println(F("EV_BEACON_FOUND"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_BEACON_FOUND\n", TAG);
+            #endif
             break;
         case EV_BEACON_MISSED:
-            Serial.println(F("EV_BEACON_MISSED"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_BEACON_MISSED\n", TAG);
+            #endif
             break;
         case EV_BEACON_TRACKED:
-            Serial.println(F("EV_BEACON_TRACKED"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_BEACON_TRACKED\n", TAG);
+            #endif
             break;
         case EV_JOINING:
-            Serial.println(F("EV_JOINING"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_JOINING\n", TAG);
+            #endif
             break;
         case EV_JOINED:
-            Serial.println(F("EV_JOINED"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_JOINED\n", TAG);
+            #endif
             break;
         case EV_RFU1:
-            Serial.println(F("EV_RFU1"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_RFU1\n", TAG);
+            #endif
             break;
         case EV_JOIN_FAILED:
-            Serial.println(F("EV_JOIN_FAILED"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_JOIN_FAILED\n", TAG);
+            #endif
             break;
         case EV_REJOIN_FAILED:
-            Serial.println(F("EV_REJOIN_FAILED"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_REJOIN_FAILED\n", TAG);
+            #endif
             break;
-        case EV_TXCOMPLETE:
-            Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
-            if (LMIC.txrxFlags & TXRX_ACK)
-              Serial.println(F("Received ack"));
-            if (LMIC.dataLen) {
-              Serial.println(F("Received "));
-              Serial.println(LMIC.dataLen);
-              Serial.println(F(" bytes of payload"));
-            }
+        case EV_TXCOMPLETE: 
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_TXCOMPLETE (includes waiting for RX windows)\n", TAG);
+                if (LMIC.txrxFlags & TXRX_ACK)
+                    Serial.printf("%s:Received ack\n",TAG);
+                if (LMIC.dataLen) { //if valid data is received
+                    Serial.printf("%s:Received ",TAG);
+                    Serial.printf("%d",LMIC.dataLen);
+                    Serial.printf(" byte(s) of payload, RSSI %d SNR %d\n", LMIC.rssi, LMIC.snr);
+                }
+            #endif
+            decode_message(LMIC.frame + LMIC.dataBeg, LMIC.dataLen);
             break;
         case EV_LOST_TSYNC: 
-            Serial.println(F("EV_LOST_TSYNC"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_LOST_TSYNC\n", TAG);
+            #endif
             break;
         case EV_RESET:
-            Serial.println(F("EV_RESET"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_RESET\n", TAG);
+            #endif
             break;
         case EV_RXCOMPLETE:
-            // data received in ping slot
-            Serial.println(F("EV_RXCOMPLETE"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_RXCOMPLETE\n", TAG);
+            #endif
             break;
         case EV_LINK_DEAD:
-            Serial.println(F("EV_LINK_DEAD"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_LINK_DEAD\n", TAG);
+            #endif
             break;
         case EV_LINK_ALIVE:
-            Serial.println(F("EV_LINK_ALIVE"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_LINK_ALIVE\n", TAG);
+            #endif
             break;
          default:
-            Serial.println(F("Unknown event"));
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is unknown\n", TAG);
+            #endif
             break;
     }
 }

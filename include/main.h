@@ -8,5 +8,6 @@
 // change setting there
 #include "conf.h"
 #include "lorawan.h"
+#include "code.h"
 
 #endif
