@@ -14,11 +14,15 @@ void wifi_setup() {
   // You can remove the password parameter if you want the AP to be open.
   WiFi.softAP(ssid, password);
   IPAddress myIP = WiFi.softAPIP();
+  #if LOG_LEVEL > 2
   Serial.printf("%s:AP IP address: ",TAG);
   Serial.println(myIP);
+  #endif
   server.begin();
 
+  #if LOG_LEVEL > 2
   Serial.printf("%s:Server started\n",TAG);
+  #endif
   while(1){
   wifi_polling();
   }
@@ -28,12 +32,16 @@ void wifi_polling() {
   WiFiClient client = server.available();   // listen for incoming clients
 
   if (client) {                             // if you get a client,
-    Serial.println("New Client.");           // print a message out the serial port
+    #if LOG_LEVEL > 2
+    Serial.printf("%s:New Client",TAG);           // print a message out the serial port
+    #endif
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
+        #if LOG_LEVEL > 3
         Serial.write(c);                    // print it out the serial monitor
+        #endif
         if (c == '\n') {                    // if the byte is a newline character
 
           // if the current line is blank, you got two newline characters in a row.
@@ -62,6 +70,8 @@ void wifi_polling() {
     }
     // close the connection:
     client.stop();
-    Serial.println("Client Disconnected.");
+    #if LOG_LEVEL > 2
+    Serial.printf("%s:Client disconnected\n",TAG);
+    #endif
   }
 }
