@@ -107,6 +107,7 @@ void lora_initialize(void * parameter){
         os_runloop_once();
         vTaskDelay(1);
     }
+    vTaskDelete(NULL); // shoud never be reached
 }
 
 void lora_send(osjob_t *job) {
@@ -137,8 +138,7 @@ void lora_send(osjob_t *job) {
         #endif
     }
   }
-  // reschedule job every 0,5 - 1 sec. including a bit of random to prevent
-  // systematic collisions
+  // reschedule job
   os_setTimedCallback(job, os_getTime()+sec2osticks(TX_INTERVAL) ,lora_send);
 }
 

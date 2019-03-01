@@ -17,14 +17,14 @@ static const char TAG[] = "code";
 //decode mode. Determins which decoder is used
 int decodeMode = 1;
 
-void decode_message(uint8_t cmd[], uint8_t cmdlength) {
+void decode_message(uint8_t data[], uint8_t datalength) {
 switch (decodeMode)
 {
     case 0:
     #if LOG_LEVEL > 2
     Serial.printf("%s:Data: ",TAG);
-    for(int icoursor = 0; icoursor < LMIC.dataLen; icoursor ++){
-        Serial.printf("%02X ",LMIC.frame[LMIC.dataBeg + icoursor]); 
+    for(int icoursor = 0; icoursor < datalength; icoursor ++){
+        Serial.printf("%02X ",data[icoursor]); 
     }
     Serial.printf("\n");
     #endif
@@ -33,8 +33,8 @@ switch (decodeMode)
     case 1:
     #if LOG_LEVEL > 2
     Serial.printf("%s:Data: ",TAG);
-    for(int icoursor = 0; icoursor < LMIC.dataLen; icoursor ++){
-        Serial.printf("%c",LMIC.frame[LMIC.dataBeg + icoursor]); 
+    for(int icoursor = 0; icoursor < datalength; icoursor ++){
+        Serial.printf("%c",data[icoursor]); 
     }
     Serial.printf("\n");
     #endif

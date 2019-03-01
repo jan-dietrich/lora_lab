@@ -44,16 +44,18 @@ SendBuffer.MessageSize = sizeof(mydata)-1;
 SendBuffer.MessagePort = 1;
 memcpy(SendBuffer.Message, mydata, SendBuffer.MessageSize);
 
-lora_setabpkeys(NWKSKEY,APPSKEY,DEVADDR);
 
+//initialize lora
+/*lora_setabpkeys(NWKSKEY,APPSKEY,DEVADDR);
 xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 2048, NULL, 5, NULL, 1);
-//lora_initialize(NULL);
-
 #if LOG_LEVEL > 2
 Serial.printf("%s:Trying to que data now...\n", TAG);
 #endif
-
 lora_enqueuedata(&SendBuffer);
+*/
+
+//wifi setup
+wifi_setup();
 }
 
 void loop() {

@@ -1,8 +1,6 @@
 #ifndef _LORAWAN_H
 #define _LORAWAN_H
 
-#include "main.h"
-
 // needed for the LMIC lib
 #include <lmic.h>
 #include <hal/hal.h>

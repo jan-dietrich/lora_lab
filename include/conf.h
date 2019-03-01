@@ -34,4 +34,7 @@
 #define SEND_QUEUE_SIZE                 10      // maximum number of messages in payload send queue [1 = no queue]
 #define SEND_BUFFER_SIZE                50
 
+// WiFi config
+#define WIFI_SSID                       "Test_WiFi"
+#define WIFI_PASSWD                     "12345678"
 #endif
