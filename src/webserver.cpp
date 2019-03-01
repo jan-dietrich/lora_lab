@@ -33,7 +33,7 @@ void wifi_polling() {
 
   if (client) {                             // if you get a client,
     #if LOG_LEVEL > 2
-    Serial.printf("%s:New Client",TAG);           // print a message out the serial port
+    Serial.printf("%s:New Client\n",TAG);           // print a message out the serial port
     #endif
     String currentLine = "";                // make a String to hold incoming data from the client
     while (client.connected()) {            // loop while the client's connected
