@@ -17,7 +17,7 @@
 //  ESP_LOG_INFO = 3
 //  ESP_LOG_DEBUG = 4
 //  ESP_LOG_VERBOSE = 5
-#define LOG_LEVEL                       5
+#define LOG_LEVEL                       3
 
 // Pins for LoRa Component
 // For detailed pin description visit GitHub of Arduino LMIC

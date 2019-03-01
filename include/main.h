@@ -10,5 +10,6 @@
 #include "lorawan.h"
 #include "code.h"
 #include "webserver.h"
+#include "webpage.h"
 
 #endif

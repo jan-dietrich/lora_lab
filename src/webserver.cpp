@@ -36,12 +36,15 @@ void wifi_polling() {
     Serial.printf("%s:New Client\n",TAG);           // print a message out the serial port
     #endif
     String currentLine = "";                // make a String to hold incoming data from the client
+    String html_header = "";
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
         #if LOG_LEVEL > 3
         Serial.write(c);                    // print it out the serial monitor
         #endif
+        html_header += c;
+
         if (c == '\n') {                    // if the byte is a newline character
 
           // if the current line is blank, you got two newline characters in a row.
@@ -53,8 +56,18 @@ void wifi_polling() {
             client.println("Content-type:text/html");
             client.println();
 
+            //react to actions by user
+            if (html_header.indexOf("GET /lora/startsendjob") >= 0) {
+                #if LOG_LEVEL > 2
+                Serial.printf("%s:Button pressed: /lora/startsendjob\n",TAG);
+                #endif
+            }
+
             // the content of the HTTP response follows the header:
-            client.println("Dies ist ein Test");
+            client.print(header);
+            client.println("Den Button dr&uumlcken um Daten per LoRa zu senden! </br>");
+            client.println("<a href=\"/lora/startsendjob\"><button class=\"button\">Daten senden</button></a>");
+            client.print(footer);
             
             // The HTTP response ends with another blank line:
             client.println();
