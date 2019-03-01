@@ -73,7 +73,7 @@ void lora_initialize(void * parameter){
     os_init();
     // Reset the MAC state. Session and pending data transfers will be discarded.
     LMIC_reset();
-    LMIC_setClockError(MAX_CLOCK_ERROR * 1 / 100); // may be used if no downlink is received. Helps to correct bad clock
+    LMIC_setClockError(MAX_CLOCK_ERROR * MAX_CLOCK_ERROR_PERCENTAGE / 100); // may be used if no downlink is received. Helps to correct bad clock
 
     //Set session
     if ((NSK != 0 ) & (ASK != 0) & (DEVADDR != 0)){
@@ -102,6 +102,7 @@ void lora_initialize(void * parameter){
 
     //call lora_send once to enable scheduled data transfer
     lora_send(&sendjob);
+    wifi_setlog("LMIC Bibliothek initialisiert</br>");
 
     for (;;) {
         os_runloop_once();
@@ -120,7 +121,7 @@ void lora_send(osjob_t *job) {
         Serial.printf("%s:OP_TXRXPEND, could not send data to LoRa Gateway. LMIC is busy\n", TAG);
         Serial.printf("%s:Opcode is: %x\n", TAG, LMIC.opmode);
     #endif
-    wifi_setlog("Daten konnten nicht gesendet werden!");
+    wifi_setlog("Daten konnten nicht gesendet werden, da kein Downlink empfangen wurde</br>");
   } else {
     #if LOG_LEVEL > 2
     Serial.printf("%s:Sendjob startet: Checking que\n", TAG);
@@ -128,6 +129,7 @@ void lora_send(osjob_t *job) {
     if (xQueueReceive(LoraSendQueue, &SendBuffer, (TickType_t)0) == pdTRUE) {
       // SendBuffer now filled with next payload from queue
       LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
+      wifi_setlog("Warteschlange an TTN gesendet</br>");
         #if LOG_LEVEL > 2
         Serial.printf("%s:%d byte(s) sent to LoRa\n",TAG, SendBuffer.MessageSize);
         Serial.printf("%s:Transmitted message: %s\n",TAG,SendBuffer.Message);
@@ -147,6 +149,7 @@ void onEvent(ev_t ev) {
     #if LOG_LEVEL > 2
     Serial.printf("%s:Event received @:%d\n",TAG,os_getTime());
     #endif
+    wifi_setlog("Event empfangen</br>");
 
     // depending on event
     switch(ev) {
@@ -250,6 +253,7 @@ void lora_enqueuedata(MessageBuffer_t *message) {
       #if LOG_LEVEL > 2
       Serial.printf("%s:%d bytes enqueued for LORA interface\n", TAG, message->MessageSize);
       #endif
+      wifi_setlog("Daten zur Warteschlange hinzugef&uumlgt</br>");
   } else {
       #if LOG_LEVEL > 1
       Serial.printf("%s:LoRa sendque is full\n", TAG);

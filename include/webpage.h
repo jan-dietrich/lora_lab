@@ -8,6 +8,7 @@ const char header[] PROGMEM = R"=====(
 <HTML>
 	<HEAD>
 			<TITLE>DHBW LoRa</TITLE>
+            <meta http-equiv="refresh" content="5; url=http://192.168.4.1">
 	</HEAD>
 <BODY>
 )=====";

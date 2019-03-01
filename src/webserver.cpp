@@ -9,14 +9,16 @@ const char *password = WIFI_PASSWD;
 
 WiFiServer server(80);
 
-String webpage_log; //stores the data that is displayed on the webpage
+String webpage_log[MAX_LOG_NUMBER + 1]; //stores the data that is displayed on the webpage
+String webpage_log_out;
+int log_counter = 0;
 
 //Data to send via LoRa
 uint8_t mydata[] = "Hello, world!";
 
 void wifi_initialize(void * parameter){
 
-  webpage_log = "Webserver gestartet";
+  wifi_setlog("Webserver gestartet</br>");
   //prepare data for LoRa
   SendBuffer.MessageSize = sizeof(mydata)-1;
   SendBuffer.MessagePort = 1;
@@ -67,7 +69,7 @@ void wifi_polling() {
             // and a content-type so the client knows what's coming, then a blank line:
             client.println("HTTP/1.1 200 OK");
             client.println("Content-type:text/html");
-            client.println();
+            client.println("");
 
             //react to actions by user
             if (html_header.indexOf("GET /lora/enquedata") >= 0) {
@@ -85,12 +87,12 @@ void wifi_polling() {
 
             // the content of the HTTP response follows the header:
             client.print(header);
-            client.println("Den Button dr&uumlcken um Daten per LoRa zu senden! </br>");
+            client.println("Den Button dr&uumlcken um Daten per LoRa zu senden!</br>");
             client.println("<a href=\"/lora/enquedata\"><button class=\"button\">Daten senden</button></a>");
             client.println("<a href=\"/lora/reset\"><button class=\"button\">LMIC Reset</button></a>");
             client.print("</br>");
-            client.print("Log: ");
-            client.print(webpage_log);
+            client.print("Log:</br>");
+            client.print(webpage_log_out);
             client.print(footer);
             
             // The HTTP response ends with another blank line:
@@ -114,5 +116,15 @@ void wifi_polling() {
 }
 
 void wifi_setlog(String log){
-webpage_log = log;
+String log_entry = String(log_counter) + ": " + log;
+for (int i = (MAX_LOG_NUMBER -1); i != 0; i--){
+    webpage_log[i] = webpage_log[i-1];
+}
+webpage_log[0] = log_entry;
+
+log_counter ++;
+webpage_log_out = "";
+for (int i = 0; i < MAX_LOG_NUMBER; i++){
+        webpage_log_out += webpage_log[i];
+    }
 }

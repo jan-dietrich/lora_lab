@@ -32,9 +32,12 @@
 
 #define PAYLOAD_BUFFER_SIZE             50      // maximum size of payload block per transmit
 #define SEND_QUEUE_SIZE                 10      // maximum number of messages in payload send queue [1 = no queue]
-#define SEND_BUFFER_SIZE                50
+#define SEND_BUFFER_SIZE                50      // size of sendbuffer
+#define MAX_CLOCK_ERROR_PERCENTAGE      1       // determins the allowed clock error (shall be < 7)
 
 // WiFi config
 #define WIFI_SSID                       "Test_WiFi"
 #define WIFI_PASSWD                     "12345678"
+
+#define MAX_LOG_NUMBER                  3       // number of log entries
 #endif

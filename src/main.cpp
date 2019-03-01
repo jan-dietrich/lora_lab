@@ -19,7 +19,6 @@
 static const char TAG[] = "main";
 
 void setup() {
-
 // enable serial monitor if log level is high enough
 #if LOG_LEVEL > 0
 Serial.begin(115200);
@@ -41,7 +40,7 @@ lora_setabpkeys(NWKSKEY,APPSKEY,DEVADDR);
 xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 2048, NULL, 5, NULL, 1);
 
 //wifi setup
-xTaskCreatePinnedToCore(wifi_initialize, "wifi_initialize", 8192, NULL, 4, NULL, 1);
+xTaskCreatePinnedToCore(wifi_initialize, "wifi_initialize", 16384, NULL, 4, NULL, 0);
 }
 
 void loop() {
