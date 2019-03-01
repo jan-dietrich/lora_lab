@@ -120,6 +120,7 @@ void lora_send(osjob_t *job) {
         Serial.printf("%s:OP_TXRXPEND, could not send data to LoRa Gateway. LMIC is busy\n", TAG);
         Serial.printf("%s:Opcode is: %x\n", TAG, LMIC.opmode);
     #endif
+    wifi_setlog("Daten konnten nicht gesendet werden!");
   } else {
     #if LOG_LEVEL > 2
     Serial.printf("%s:Sendjob startet: Checking que\n", TAG);

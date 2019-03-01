@@ -9,7 +9,18 @@ const char *password = WIFI_PASSWD;
 
 WiFiServer server(80);
 
-void wifi_setup() {
+String webpage_log; //stores the data that is displayed on the webpage
+
+//Data to send via LoRa
+uint8_t mydata[] = "Hello, world!";
+
+void wifi_initialize(void * parameter){
+
+  webpage_log = "Webserver gestartet";
+  //prepare data for LoRa
+  SendBuffer.MessageSize = sizeof(mydata)-1;
+  SendBuffer.MessagePort = 1;
+  memcpy(SendBuffer.Message, mydata, SendBuffer.MessageSize);
 
   // You can remove the password parameter if you want the AP to be open.
   WiFi.softAP(ssid, password);
@@ -23,16 +34,18 @@ void wifi_setup() {
   #if LOG_LEVEL > 2
   Serial.printf("%s:Server started\n",TAG);
   #endif
-  while(1){
-  wifi_polling();
-  }
+  for (;;) {
+        wifi_polling();
+        vTaskDelay(1);
+    }
+    vTaskDelete(NULL); // shoud never be reached
 }
 
 void wifi_polling() {
   WiFiClient client = server.available();   // listen for incoming clients
 
   if (client) {                             // if you get a client,
-    #if LOG_LEVEL > 2
+    #if LOG_LEVEL > 3
     Serial.printf("%s:New Client\n",TAG);           // print a message out the serial port
     #endif
     String currentLine = "";                // make a String to hold incoming data from the client
@@ -57,16 +70,27 @@ void wifi_polling() {
             client.println();
 
             //react to actions by user
-            if (html_header.indexOf("GET /lora/startsendjob") >= 0) {
+            if (html_header.indexOf("GET /lora/enquedata") >= 0) {
                 #if LOG_LEVEL > 2
-                Serial.printf("%s:Button pressed: /lora/startsendjob\n",TAG);
+                Serial.printf("%s:Button pressed: /lora/enquedata\n",TAG);
                 #endif
+                lora_enqueuedata(&SendBuffer);
+            }
+            else if (html_header.indexOf("GET /lora/reset") >= 0) {
+                #if LOG_LEVEL > 2
+                Serial.printf("%s:Button pressed: /lora/reset\n",TAG);
+                #endif
+                xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 2048, NULL, 5, NULL, 1);
             }
 
             // the content of the HTTP response follows the header:
             client.print(header);
             client.println("Den Button dr&uumlcken um Daten per LoRa zu senden! </br>");
-            client.println("<a href=\"/lora/startsendjob\"><button class=\"button\">Daten senden</button></a>");
+            client.println("<a href=\"/lora/enquedata\"><button class=\"button\">Daten senden</button></a>");
+            client.println("<a href=\"/lora/reset\"><button class=\"button\">LMIC Reset</button></a>");
+            client.print("</br>");
+            client.print("Log: ");
+            client.print(webpage_log);
             client.print(footer);
             
             // The HTTP response ends with another blank line:
@@ -83,8 +107,12 @@ void wifi_polling() {
     }
     // close the connection:
     client.stop();
-    #if LOG_LEVEL > 2
+    #if LOG_LEVEL > 3
     Serial.printf("%s:Client disconnected\n",TAG);
     #endif
   }
+}
+
+void wifi_setlog(String log){
+webpage_log = log;
 }
