@@ -34,7 +34,8 @@ Serial.printf("%s:Currently running %s in version %s\n",TAG, ESPNAME, PROGVERSIO
 xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
 
 //wifi setup
-xTaskCreatePinnedToCore(wifi_initialize, "wifi_initialize", 16384, NULL, 4, NULL, 0);
+//xTaskCreatePinnedToCore(wifi_initialize, "wifi_initialize", 16384, NULL, 4, NULL, 0);
+wifi_initialize();
 }
 
 void loop() {

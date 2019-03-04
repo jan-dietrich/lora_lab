@@ -7,7 +7,7 @@ static const char TAG[] = "wifi";
 const char *ssid = WIFI_SSID;
 const char *password = WIFI_PASSWD;
 
-WiFiServer server(80);
+AsyncWebServer server(80);
 
 String webpage_log[MAX_LOG_NUMBER + 1]; //stores the data that is displayed on the webpage
 String webpage_log_out;
@@ -16,14 +16,12 @@ int log_counter = 0;
 //Data to send via LoRa
 uint8_t mydata[] = "Hello, world!";
 
-void wifi_initialize(void * parameter){
+String processor(const String& var){
+  String sreturn = "";
+  return sreturn;
+}
 
-  wifi_setlog("Webserver gestartet");
-  //prepare data for LoRa
-  SendBuffer.MessageSize = sizeof(mydata)-1;
-  SendBuffer.MessagePort = 1;
-  memcpy(SendBuffer.Message, mydata, SendBuffer.MessageSize);
-
+void wifi_initialize(){
   //disable the core 0 watchdog
   TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
   TIMERG0.wdt_feed=1;
@@ -41,107 +39,38 @@ void wifi_initialize(void * parameter){
   #if LOG_LEVEL > 2
   Serial.printf("%s:Server started\n",TAG);
   #endif
-  for (;;) {
-        wifi_polling();
-        vTaskDelay(1);
-    }
-    vTaskDelete(NULL); // shoud never be reached
+  
+  //initialize SPIFFS
+  if(!SPIFFS.begin(true)){
+  #if LOG_LEVEL > 0
+  Serial.printf("%s:An Error has occurred while mounting SPIFFS",TAG);
+  #endif
+  return;
+  }
+
+  //define get requests for webserver
+  //main webpage
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/index.html", String(), false, processor);
+  });
+  //dhbw logo
+  server.on("/img/dhbw_logo.png", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/img/dhbw_logo.png", "image/png");
+  });
+
+  //after all requests finally start webserver
+  server.begin(); 
+  wifi_setlog("Webserver gestartet");
+
+  //prepare data for LoRa
+  SendBuffer.MessageSize = sizeof(mydata)-1;
+  SendBuffer.MessagePort = 1;
+  memcpy(SendBuffer.Message, mydata, SendBuffer.MessageSize);
+
 }
 
 void wifi_polling() {
-  WiFiClient client = server.available();   // listen for incoming clients
-
-  if (client) {                             // if you get a client,
-    #if LOG_LEVEL > 3
-    Serial.printf("%s:New Client\n",TAG);           // print a message out the serial port
-    #endif
-    String currentLine = "";                // make a String to hold incoming data from the client
-    String html_header = "";
-    while (client.connected()) {            // loop while the client's connected
-      if (client.available()) {             // if there's bytes to read from the client,
-        char c = client.read();             // read a byte, then
-        #if LOG_LEVEL > 3
-        Serial.write(c);                    // print it out the serial monitor
-        #endif
-        html_header += c;
-
-        if (c == '\n') {                    // if the byte is a newline character
-
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
-            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-            // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("");
-
-            //react to actions by user
-            if (html_header.indexOf("GET /lora/enquedata") >= 0) {
-                #if LOG_LEVEL > 2
-                Serial.printf("%s:Button pressed: /lora/enquedata\n",TAG);
-                #endif
-                lora_enqueuedata(&SendBuffer);
-            }
-            else if (html_header.indexOf("GET /lora/reset") >= 0) {
-                #if LOG_LEVEL > 2
-                Serial.printf("%s:Button pressed: /lora/reset\n",TAG);
-                #endif
-                xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 2048, NULL, 5, NULL, 1);
-                wifi_setlog("LMIC wird neu gestartet");
-            }
-            else if (html_header.indexOf("GET /lora/setkeys/abp") >= 0) {
-                #if LOG_LEVEL > 2
-                Serial.printf("%s:Button pressed: /lora/setkeys/abp\n",TAG);
-                #endif
-                //lora_setabpkeys(NWKSKEY,APPSKEY,DEVADDR);
-                wifi_setlog("Keys f&uumlr ABP wurden gesetzt");
-            }
-            else if (html_header.indexOf("GET /lora/setkeys/otaa") >= 0) {
-                #if LOG_LEVEL > 2
-                Serial.printf("%s:Button pressed: /lora/setkeys/otaa\n",TAG);
-                #endif
-                
-                wifi_setlog("Keys f&uumlr OTAA wurden gesetzt");
-            }
-            else if (html_header.indexOf("GET /lora/lmic/abp") >= 0) {
-                #if LOG_LEVEL > 2
-                Serial.printf("%s:Button pressed: /lora/lmic/abp\n",TAG);
-                #endif
-                
-                wifi_setlog("LMIC Stack wird mit ABP Keys initialisiert");
-            }
-            else if (html_header.indexOf("GET /lora/lmic/otaa") >= 0) {
-                #if LOG_LEVEL > 2
-                Serial.printf("%s:Button pressed: /lora/setkeys/abp\n",TAG);
-                #endif
-                
-                wifi_setlog("LMIC Stack wird mit OTAA Keys initialisiert");
-            }
-
-            // the content of the HTTP response follows the header:
-            client.print(header);
-            client.print(webpage_log_out);
-            client.print(footer);
-            
-            // The HTTP response ends with another blank line:
-            client.println();
-            // break out of the while loop:
-            break;
-          } else {    // if you got a newline, then clear currentLine:
-            currentLine = "";
-          }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
-        }
-      }
-    }
-    // close the connection:
-    client.stop();
-    #if LOG_LEVEL > 3
-    Serial.printf("%s:Client disconnected\n",TAG);
-    #endif
-  }
+ 
 }
 
 void wifi_setlog(String log){

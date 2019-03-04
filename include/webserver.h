@@ -2,8 +2,8 @@
 #define _WEBSERVER_H
 
 #include <WiFi.h>
-#include <WiFiClient.h>
-#include <WiFiAP.h>
+#include "ESPAsyncWebServer.h"
+#include "SPIFFS.h"
 
 //used to disable the core 0 watchdog
 #include "soc/timer_group_struct.h"
@@ -13,7 +13,7 @@
 extern MessageBuffer_t SendBuffer;
 
 //set up for the webserver and access point
-void wifi_initialize(void * parameter);
+void wifi_initialize();
 
 //shall run all the time to react to new clients
 void wifi_polling();
