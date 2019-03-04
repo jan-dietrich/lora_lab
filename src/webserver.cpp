@@ -93,12 +93,6 @@ void wifi_polling() {
 
             // the content of the HTTP response follows the header:
             client.print(header);
-            client.println("Den Button dr&uumlcken um Daten per LoRa zu senden!</br>");
-            client.println("<a href=\"/lora/enquedata\"><button class=\"button\">Daten senden</button></a>");
-            client.println("<a href=\"/lora/reset\"><button class=\"button\">LMIC Reset</button></a>");
-            client.print("</br>");
-            client.print("</br>");
-            client.print("Log:</br>");
             client.print(webpage_log_out);
             client.print(footer);
             
