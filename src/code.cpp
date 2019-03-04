@@ -15,7 +15,7 @@
 static const char TAG[] = "code";
 
 //decode mode. Determins which decoder is used
-int decodeMode = 0;
+int decodeMode = 1;
 
 void decode_message(uint8_t data[], uint8_t datalength) {
     String wifi_output = "Empfangene Daten: ";
@@ -30,7 +30,7 @@ switch (decodeMode)
     Serial.printf("\n");
     #endif
     for(int icoursor = 0; icoursor < datalength; icoursor ++){
-        wifi_output += data[icoursor]; 
+        wifi_output += String(data[icoursor],HEX) + " "; 
     }
     break;
 
@@ -42,6 +42,9 @@ switch (decodeMode)
     }
     Serial.printf("\n");
     #endif
+    for(int icoursor = 0; icoursor < datalength; icoursor ++){
+        wifi_output += char(data[icoursor]); 
+    }
     break;
 
     default:

@@ -37,7 +37,7 @@ u4_t DEVADDR = 0x26011C08 ;
 
 //initialize lora
 lora_setabpkeys(NWKSKEY,APPSKEY,DEVADDR);
-xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 2048, NULL, 5, NULL, 1);
+xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
 
 //wifi setup
 xTaskCreatePinnedToCore(wifi_initialize, "wifi_initialize", 16384, NULL, 4, NULL, 0);
