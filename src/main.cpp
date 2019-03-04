@@ -44,5 +44,5 @@ xTaskCreatePinnedToCore(wifi_initialize, "wifi_initialize", 16384, NULL, 4, NULL
 }
 
 void loop() {
-    
+
 }

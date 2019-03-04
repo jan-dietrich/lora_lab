@@ -91,8 +91,23 @@ void lora_initialize(void * parameter){
     }
     LMIC_setSession (0x1, DEVADDR1, NWKSKEY, APPSKEY);
 
+    // define additional channels
+    /*
+    LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
+    LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI);      // g-band
+    LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
+    LMIC_setupChannel(3, 867100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
+    LMIC_setupChannel(4, 867300000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
+    LMIC_setupChannel(5, 867500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
+    LMIC_setupChannel(6, 867700000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
+    LMIC_setupChannel(7, 867900000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
+    LMIC_setupChannel(8, 868800000, DR_RANGE_MAP(DR_FSK,  DR_FSK),  BAND_MILLI);      // g2-band
+    */
     // Disable link check validation
     LMIC_setLinkCheckMode(0);
+
+    // disable automatic datarate
+    //LMIC_setAdrMode (0);
 
     // TTN uses SF9 for its RX2 window. Is defined by TTN and must not be changed
     LMIC.dn2Dr = DR_SF9;
@@ -102,7 +117,7 @@ void lora_initialize(void * parameter){
 
     //call lora_send once to enable scheduled data transfer
     lora_send(&sendjob);
-    wifi_setlog("LMIC Bibliothek initialisiert</br>");
+    wifi_setlog("LMIC Bibliothek initialisiert");
 
     for (;;) {
         os_runloop_once();
@@ -115,13 +130,13 @@ void lora_send(osjob_t *job) {
   MessageBuffer_t SendBuffer;
   // Check if there is a pending TX/RX job running, if yes don't eat data
   // since it cannot be sent right now
-  if (LMIC.opmode & OP_TXRXPEND) {
+  if ((LMIC.opmode & (OP_JOINING | OP_REJOIN | OP_TXDATA | OP_POLL)) != 0) {
     // waiting for LoRa getting ready
     #if LOG_LEVEL > 1
         Serial.printf("%s:OP_TXRXPEND, could not send data to LoRa Gateway. LMIC is busy\n", TAG);
         Serial.printf("%s:Opcode is: %x\n", TAG, LMIC.opmode);
     #endif
-    wifi_setlog("Daten konnten nicht gesendet werden, da kein Downlink empfangen wurde</br>");
+    wifi_setlog("Daten konnten nicht gesendet werden, da LMIC noch arbeitet");
   } else {
     #if LOG_LEVEL > 2
     Serial.printf("%s:Sendjob startet: Checking que\n", TAG);
@@ -129,7 +144,7 @@ void lora_send(osjob_t *job) {
     if (xQueueReceive(LoraSendQueue, &SendBuffer, (TickType_t)0) == pdTRUE) {
       // SendBuffer now filled with next payload from queue
       LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
-      wifi_setlog("Warteschlange an TTN gesendet</br>");
+      wifi_setlog("Warteschlange an TTN gesendet");
         #if LOG_LEVEL > 2
         Serial.printf("%s:%d byte(s) sent to LoRa\n",TAG, SendBuffer.MessageSize);
         Serial.printf("%s:Transmitted message: %s\n",TAG,SendBuffer.Message);
@@ -139,6 +154,7 @@ void lora_send(osjob_t *job) {
         #if LOG_LEVEL > 1
             Serial.printf("%s:Warning! No entries in que\n",TAG);
         #endif
+        wifi_setlog("Keine Daten in der Warteschlange");
     }
   }
   // reschedule job
@@ -149,7 +165,7 @@ void onEvent(ev_t ev) {
     #if LOG_LEVEL > 2
     Serial.printf("%s:Event received @:%d\n",TAG,os_getTime());
     #endif
-    wifi_setlog("Event empfangen</br>");
+    wifi_setlog("Event empfangen");
 
     // depending on event
     switch(ev) {
@@ -253,7 +269,7 @@ void lora_enqueuedata(MessageBuffer_t *message) {
       #if LOG_LEVEL > 2
       Serial.printf("%s:%d bytes enqueued for LORA interface\n", TAG, message->MessageSize);
       #endif
-      wifi_setlog("Daten zur Warteschlange hinzugef&uumlgt</br>");
+      wifi_setlog("Daten zur Warteschlange hinzugef&uumlgt");
   } else {
       #if LOG_LEVEL > 1
       Serial.printf("%s:LoRa sendque is full\n", TAG);

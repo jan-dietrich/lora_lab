@@ -18,11 +18,16 @@ uint8_t mydata[] = "Hello, world!";
 
 void wifi_initialize(void * parameter){
 
-  wifi_setlog("Webserver gestartet</br>");
+  wifi_setlog("Webserver gestartet");
   //prepare data for LoRa
   SendBuffer.MessageSize = sizeof(mydata)-1;
   SendBuffer.MessagePort = 1;
   memcpy(SendBuffer.Message, mydata, SendBuffer.MessageSize);
+
+  //disable the core 0 watchdog
+  TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
+  TIMERG0.wdt_feed=1;
+  TIMERG0.wdt_wprotect=0;
 
   // You can remove the password parameter if you want the AP to be open.
   WiFi.softAP(ssid, password);
@@ -83,6 +88,7 @@ void wifi_polling() {
                 Serial.printf("%s:Button pressed: /lora/reset\n",TAG);
                 #endif
                 xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 2048, NULL, 5, NULL, 1);
+                wifi_setlog("LMIC wird neu gestartet");
             }
 
             // the content of the HTTP response follows the header:
@@ -90,6 +96,7 @@ void wifi_polling() {
             client.println("Den Button dr&uumlcken um Daten per LoRa zu senden!</br>");
             client.println("<a href=\"/lora/enquedata\"><button class=\"button\">Daten senden</button></a>");
             client.println("<a href=\"/lora/reset\"><button class=\"button\">LMIC Reset</button></a>");
+            client.print("</br>");
             client.print("</br>");
             client.print("Log:</br>");
             client.print(webpage_log_out);
@@ -116,7 +123,7 @@ void wifi_polling() {
 }
 
 void wifi_setlog(String log){
-String log_entry = String(log_counter) + ": " + log;
+String log_entry = String(log_counter) + ": " + log + "</br>";
 for (int i = (MAX_LOG_NUMBER -1); i != 0; i--){
     webpage_log[i] = webpage_log[i-1];
 }

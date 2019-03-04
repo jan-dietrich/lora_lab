@@ -5,6 +5,10 @@
 #include <WiFiClient.h>
 #include <WiFiAP.h>
 
+//used to disable the core 0 watchdog
+#include "soc/timer_group_struct.h"
+#include "soc/timer_group_reg.h"
+
 //data for LoRa
 extern MessageBuffer_t SendBuffer;
 
