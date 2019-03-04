@@ -90,6 +90,34 @@ void wifi_polling() {
                 xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 2048, NULL, 5, NULL, 1);
                 wifi_setlog("LMIC wird neu gestartet");
             }
+            else if (html_header.indexOf("GET /lora/setkeys/abp") >= 0) {
+                #if LOG_LEVEL > 2
+                Serial.printf("%s:Button pressed: /lora/setkeys/abp\n",TAG);
+                #endif
+                //lora_setabpkeys(NWKSKEY,APPSKEY,DEVADDR);
+                wifi_setlog("Keys f&uumlr ABP wurden gesetzt");
+            }
+            else if (html_header.indexOf("GET /lora/setkeys/otaa") >= 0) {
+                #if LOG_LEVEL > 2
+                Serial.printf("%s:Button pressed: /lora/setkeys/otaa\n",TAG);
+                #endif
+                
+                wifi_setlog("Keys f&uumlr OTAA wurden gesetzt");
+            }
+            else if (html_header.indexOf("GET /lora/lmic/abp") >= 0) {
+                #if LOG_LEVEL > 2
+                Serial.printf("%s:Button pressed: /lora/lmic/abp\n",TAG);
+                #endif
+                
+                wifi_setlog("LMIC Stack wird mit ABP Keys initialisiert");
+            }
+            else if (html_header.indexOf("GET /lora/lmic/otaa") >= 0) {
+                #if LOG_LEVEL > 2
+                Serial.printf("%s:Button pressed: /lora/setkeys/abp\n",TAG);
+                #endif
+                
+                wifi_setlog("LMIC Stack wird mit OTAA Keys initialisiert");
+            }
 
             // the content of the HTTP response follows the header:
             client.print(header);

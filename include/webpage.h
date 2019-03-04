@@ -2,13 +2,15 @@
 #define _WEBPAGE_H
 
 #include "main.h"
+//for automatic refresh
+//<meta http-equiv="refresh" content="5; url=http://192.168.4.1">
 
 //shall be displayed as header of the webpage
 const char header[] PROGMEM = R"=====(
 <HTML>
 	<HEAD>
 			<TITLE>DHBW LoRa</TITLE>
-            <meta http-equiv="refresh" content="5; url=http://192.168.4.1">
+            
 	</HEAD>
 <BODY>
 <h1>DHBW LoRa Versuchsboard</h1>
@@ -43,19 +45,19 @@ MSB Sortierung! </br>
 </tr>
 <tr>
 <td>
-<a href=\"/lora/setkeys/abp\"><button class=\"button\">ABP setzen</button></a>
+<a href=/lora/setkeys/abp><button class=\"button\">ABP setzen</button></a>
 </td>
 <td>
-<a href=\"/lora/setkeys/otaa\"><button class=\"button\">OTAA setzen</button></a>
+<a href=/lora/setkeys/otaa><button class=\"button\">OTAA setzen</button></a>
 </td>
 </tr>
 </table>
 <h2>Schritt 2: LMIC Stack initialisieren</h2>
-<a href=\"/lora/lmic/abp\"><button class=\"button\">LMIC ABP Modus</button></a><a href=\"/lora/slmic/otaa\"><button class=\"button\">LMIC OTAA Modus</button></a>
+<a href=/lora/lmic/abp><button class=\"button\">LMIC ABP Modus</button></a><a href=/lora/lmic/otaa><button class=\"button\">LMIC OTAA Modus</button></a>
 <h2>Schritt 3: Parameter f&uumlr die &Uumlbertragung</h2>
 <h2>Schritt 4: Daten in die Warteschlange einreihen</h2>
-<a href=\"/lora/enquedata\"><button class=\"button\">Daten senden</button></a>
-<a href=\"/lora/reset\"><button class=\"button\">LMIC Reset</button></a>
+<a href=/lora/enquedata><button class=\"button\">Daten senden</button></a>
+<a href=/lora/reset><button class=\"button\">LMIC Reset</button></a>
 </br>
 </br>
 <h2>Log</h2>

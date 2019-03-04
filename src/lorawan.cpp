@@ -236,7 +236,7 @@ void onEvent(ev_t ev) {
                     Serial.printf(" byte(s) of payload, RSSI %d SNR %d\n", LMIC.rssi, LMIC.snr);
                 }
             #endif
-            wifi_setlog("Event empfangen: TX abgeschlossen");
+            wifi_setlog("Event empfangen: TX abgeschlossen (einschließlich warten auf RX Fenster)");
             decode_message(LMIC.frame + LMIC.dataBeg, LMIC.dataLen);
             break;
         case EV_LOST_TSYNC: 
