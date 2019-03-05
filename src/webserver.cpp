@@ -7,7 +7,18 @@ static const char TAG[] = "wifi";
 const char *ssid = WIFI_SSID;
 const char *password = WIFI_PASSWD;
 
+//define variables for state
+String state_lmic = "Nicht gestartet";
+String state_lmicmode = "Noch nicht gesetzt";
+String state_sf = "SF7";
+String state_bw = "125kHz";
+String state_cr = "4/5";
+
 AsyncWebServer server(80);
+
+//open up websocket to handle JavaScript requests from buttons
+AsyncWebSocket ws("/socket");
+AsyncWebSocketClient * globalClient = NULL;
 
 String webpage_log[MAX_LOG_NUMBER + 1]; //stores the data that is displayed on the webpage
 String webpage_log_out;
@@ -17,8 +28,13 @@ int log_counter = 0;
 uint8_t mydata[] = "Hello, world!";
 
 String processor(const String& var){
-  String sreturn = "";
-  return sreturn;
+String state;
+  if(var == "state_lmic") state = state_lmic;
+  else if (var == "state_lmicmode") state = state_lmicmode;
+  else if (var == "state_sf") state = state_sf;
+  else if (var == "state_bw") state = state_bw;
+  else if (var == "state_cr") state = state_cr;
+  return state;
 }
 
 void wifi_initialize(){
@@ -34,6 +50,10 @@ void wifi_initialize(){
   Serial.printf("%s:AP IP address: ",TAG);
   Serial.println(myIP);
   #endif
+
+  //register handler
+  ws.onEvent(onWsEvent);
+  server.addHandler(&ws);
   server.begin();
 
   #if LOG_LEVEL > 2
@@ -53,6 +73,10 @@ void wifi_initialize(){
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
   request->send(SPIFFS, "/index.html", String(), false, processor);
   });
+  //css stylesheet
+  server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/style.css", "text/css");
+  });
   //dhbw logo
   server.on("/img/dhbw_logo.png", HTTP_GET, [](AsyncWebServerRequest *request){
   request->send(SPIFFS, "/img/dhbw_logo.png", "image/png");
@@ -69,8 +93,21 @@ void wifi_initialize(){
 
 }
 
-void wifi_polling() {
+void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
  
+  if(type == WS_EVT_CONNECT){
+    Serial.printf("%s:Websocket connected!\n",TAG);
+    globalClient = client;
+  }
+  else if (type == WS_EVT_DATA){
+    #if LOG_LEVEL > 2
+    Serial.printf("%s:JavaScript Event: WS_EVT_DATA\n",TAG);
+    for (int i = 0; i < len;i++){
+      Serial.print((char) data[i]);
+    }
+    Serial.printf("\n");
+    #endif
+  }
 }
 
 void wifi_setlog(String log){
@@ -81,8 +118,11 @@ for (int i = (MAX_LOG_NUMBER -1); i != 0; i--){
 webpage_log[0] = log_entry;
 
 log_counter ++;
-webpage_log_out = "";
+webpage_log_out = "#log#";
 for (int i = 0; i < MAX_LOG_NUMBER; i++){
         webpage_log_out += webpage_log[i];
-    }
+}
+if(globalClient != NULL && globalClient->status() == WS_CONNECTED){
+      globalClient->text(webpage_log_out);
+   }
 }

@@ -15,8 +15,8 @@ extern MessageBuffer_t SendBuffer;
 //set up for the webserver and access point
 void wifi_initialize();
 
-//shall run all the time to react to new clients
-void wifi_polling();
+//handle JavaScript requests
+void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len);
 
 //sets the website log
 void wifi_setlog(String log);

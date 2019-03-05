@@ -1,14 +1,150 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+	<link rel="stylesheet" href="style.css">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>DHBW LoRa</title>
+    <script type = "text/javascript">
+        var ws = new WebSocket("ws://192.168.4.1/socket");
+        //data from websocket
+        ws.onmessage = function(evt) {
+            document.getElementById("log").innerHTML  = evt.data;
+        };
+
+        function setKeysABP(){
+            var NSK = document.getElementById("KeysABPNSK").value;
+            var ASK = document.getElementById("KeysABPASK").value;
+            var DEVADDR = document.getElementById("KeysABPDEVADDR").value;
+ 
+            var data = "ASK:" + ASK + ";NSK:" + NSK + ";DEVADDR:" + DEVADDR + ";";
+            ws.send(data);
+            alert("ABP Keys gesetzt");
+         }
+		 function setKeysOTAA(){
+            var DEUI = document.getElementById("KeysOTAADEUI").value;
+            var AEUI = document.getElementById("KeysOTAAAEUI").value;
+            var APPKEY = document.getElementById("KeysOTAAAPPKEY").value;
+ 
+            var data = "DEUI:" + DEUI + ";AEUI:" + AEUI + ";APPKEY:" + APPKEY + ";";
+            ws.send(data);
+            alert("OTAA Keys gesetzt");
+         }
+    </script>
 </head>
 <body>
+<div class="header">
     <img src="img/dhbw_logo.png" alt="dhbw logo">
+    <div class="float-right">
+        <h1>LoRaWAN Versuchsaufbau</h1></br>
+        <h2>by Jan Dietrich &copy 2019</h2>
+    </div>
+</div>
+<hr />
 
-<h1>
-    Long Range Wide Area Network Versuchsaufbau
-</h1>
+<div class="section">
+<h3>Aktueller Status des Boards 
+<div class="float-right">
+Log
+</div>
+</h3>
+<div class="float-right">
+<p id="log">Keine Einträge</p>
+</div>
+
+<table>
+<tr>
+<td width="300px">
+<table>
+	<tr>
+    	<td>LMIC Stack:</td><td>%state_lmic%</td>
+    </tr>
+    <tr>
+    	<td>Modus:</td><td>%state_lmicmode%</td>
+    </tr>
+    <tr>
+        <td>Spreizfaktor:</td><td>%state_sf%</td>
+    </tr>
+    <tr>
+    	<td>Coderate:</td><td>%state_cr%</td>
+    </tr>
+    <tr>
+    	<td>Bandbreite:</td><td>%state_bw%</td>
+    </tr>
+</table>
+</td>
+<td>
+<button class="button" onclick = "LMICReset()" id = "LMICResetButton">LMIC zurücksetzen</button>
+</td>
+</tr>
+</table> <br />
+<important>Die folgenden Einstellung müssen nacheinander durchgearbeitet werden!</important>
+</div>
+<div class="section">
+<h3>1. Zugangsdaten</h3>
+Als Zugang für das LoRaWAN Netz wird das TTN verwendet. Die Zugangsdaten können der Konsole entnommen werden <br/>
+<warning>Es wird zwischen ABP und OTAA Zugang entschieden. Es werden unterschiedliche Keys benötigt</warning><br />
+<details>
+  <summary>Zugang via ABP</summary>
+  <table>
+  	<tr>
+  		<td width="200px">Network Session Key</td>
+        <td><input type = "text" id = "KeysABPNSK"></input></td>
+        <td>MSB { 0xAA, ... , 0xDD }</td>
+    </tr>	
+    <tr>
+  		<td>Application Session Key</td>
+        <td><input type = "text" id = "KeysABPASK"></input></td>
+        <td>MSB { 0xAA, ... , 0xDD }</td>
+    </tr>
+    <tr>
+  		<td>Device Address</td>
+        <td><input type = "text" id = "KeysABPDEVADDR"></input></td>
+        <td>1234567A</td>
+    </tr>
+  </table>
+  <button class="button" onclick = "setKeysABP()" id = "setKeysABPButton">ABP Keys setzen</button>
+</details><br />
+<details>
+  <summary>Zugang via OTAA</summary>
+  <table>
+  	<tr>
+  		<td width="200px">Device EUI</td>
+        <td><input type = "text" id = "KeysOTAADEUI"></input></td>
+        <td><important>LSB</important> { 0xAA, ... , 0xDD }</td>
+    </tr>	
+    <tr>
+  		<td>Application EUI</td>
+        <td><input type = "text" id = "KeysOTAAAEUI"></input></td>
+        <td><important>LSB</important> { 0xAA, ... , 0xDD }</td>
+    </tr>
+    <tr>
+  		<td>App Key</td>
+        <td><input type = "text" id = "KeysOTAAAPPKEY"></input></td>
+        <td><important>MSB</important> { 0xAA, ... , 0xDD }</td>
+    </tr>
+  </table>
+  <button class="button" onclick = "setKeysOTAA()" id = "setKeysOTAAButton">OTAA Keys setzen</button>
+</details>
+</div>
+<div class="section">
+<h3>2. LMIC initialisieren</h3>
+<important>Es müssen zunächst die richtigen Keys gesetzt werden! Sonst crashed der Prozessor!</important><br />
+<button class="button" onclick = "LMICABP()" id = "LMICABPButton">LMIC im ABP Modus starten</button>
+<button class="button" onclick = "LMICOTAA()" id = "LMICOTAAButton">LMIC im OTAA Modus starten</button>
+</div>
+<div class="section">
+<h3>3. Übertragungsparameter verändern</h3>
+Spreizfaktor: 
+	<button class="button" onclick = "setSF(this)" id = "setSF7Button">SF7</button>
+    <button class="button" onclick = "setSF(this)" id = "setSF8Button">SF8</button>
+    <button class="button" onclick = "setSF(this)" id = "setSF9Button">SF9</button>
+    <button class="button" onclick = "setSF(this)" id = "setSF10Button">SF10</button>
+    <button class="button" onclick = "setSF(this)" id = "setSF11Button">SF11</button>
+    <button class="button" onclick = "setSF(this)" id = "setSF12Button">SF12</button>
+</div>
+<div class="section">
+<h3>4. Daten in die Warteschlange einreihen</h3>
+<button class="button" onclick = "sendData()" id = "sendDataButton">Daten an TTN senden</button>
+</div>
 </body>
 </html>
