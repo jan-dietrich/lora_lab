@@ -8,7 +8,8 @@
         var ws = new WebSocket("ws://192.168.4.1/socket");
         //data from websocket
         ws.onmessage = function(evt) {
-            document.getElementById("log").innerHTML  = evt.data;
+            var datahandler = evt.data.split(';');
+            document.getElementById(datahandler[0]).innerHTML  = datahandler[1];
         };
 
         function setKeysABP(){
@@ -16,7 +17,7 @@
             var ASK = document.getElementById("KeysABPASK").value;
             var DEVADDR = document.getElementById("KeysABPDEVADDR").value;
  
-            var data = "ASK:" + ASK + ";NSK:" + NSK + ";DEVADDR:" + DEVADDR + ";";
+            var data = "data_keys_abp;" + NSK + ";" + ASK + ";" + DEVADDR + ";";
             ws.send(data);
             alert("ABP Keys gesetzt");
          }
@@ -25,10 +26,14 @@
             var AEUI = document.getElementById("KeysOTAAAEUI").value;
             var APPKEY = document.getElementById("KeysOTAAAPPKEY").value;
  
-            var data = "DEUI:" + DEUI + ";AEUI:" + AEUI + ";APPKEY:" + APPKEY + ";";
+            var data = "data_keys_otaa;" + DEUI + ";" + AEUI + ";" + APPKEY + ";";
             ws.send(data);
             alert("OTAA Keys gesetzt");
          }
+         function LMICABP(){ws.send("data_lmic_abp");}
+         function LMICOTAA(){ws.send("data_lmic_otaa");}
+         function sendData(){ws.send("data_send");}
+         function LMICReset(){ws.send("data_lmic_reset");}
     </script>
 </head>
 <body>
@@ -48,7 +53,7 @@ Log
 </div>
 </h3>
 <div class="float-right">
-<p id="log">Keine Einträge</p>
+<p id="data_log">Keine Einträge</p>
 </div>
 
 <table>
@@ -56,19 +61,19 @@ Log
 <td width="300px">
 <table>
 	<tr>
-    	<td>LMIC Stack:</td><td>%state_lmic%</td>
+    	<td>LMIC Stack:</td><td id="data_state_lmic">Reset Zustand</td>
     </tr>
     <tr>
-    	<td>Modus:</td><td>%state_lmicmode%</td>
+    	<td>Modus:</td><td id="data_state_lmicmode">Nicht gesetzt</td>
     </tr>
     <tr>
-        <td>Spreizfaktor:</td><td>%state_sf%</td>
+        <td>Spreizfaktor:</td><td id="data_state_sf">Kein SF</td>
     </tr>
     <tr>
-    	<td>Coderate:</td><td>%state_cr%</td>
+    	<td>Coderate:</td><td id="data_state_cr">Keine CR</td>
     </tr>
     <tr>
-    	<td>Bandbreite:</td><td>%state_bw%</td>
+    	<td>Bandbreite:</td><td id="data_state_bw">Keine BW</td>
     </tr>
 </table>
 </td>

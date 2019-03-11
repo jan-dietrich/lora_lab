@@ -44,16 +44,17 @@ const lmic_pinmap lmic_pins = {
     .dio = {LORA_DIO0, LORA_DIO1, LORA_DIO2},
 };
 
-void lora_setabpkeys(u1_t NSK[16], u1_t ASK[16], u4_t DEVADDR){
-    NSK = NSK;
-    ASK = ASK;
-    DEVADDR = DEVADDR;
+void lora_setabpkeys(u1_t* web_NSK, u1_t* web_ASK, u4_t* web_DEVADDR){
+    memcpy(NSK,web_NSK,sizeof(NSK));
+    memcpy(ASK,web_ASK,sizeof(ASK));
+    memcpy(&DEVADDR,web_DEVADDR,sizeof(DEVADDR));
 
-    #if LOG_LEVEL > 3
+    #if LOG_LEVEL > 2
         Serial.printf("%S:Network Session Key set to %u\n", TAG, NSK);
         Serial.printf("%S:Application Session Key set to %u\n", TAG, ASK);
         Serial.printf("%S:Device Address set to %u\n", TAG, DEVADDR);
     #endif
+    wifi_setlog("ABP Keys gesetzt");
 }
 
 // initializes the lora module and sets the correct channels
@@ -80,6 +81,15 @@ void lora_initialize(void * parameter){
     LMIC_setSession (0x1, DEVADDR, NSK, ASK);
     #if LOG_LEVEL > 2 
         Serial.printf("%s:Set LMIC session parameters successfully\n",TAG);
+        Serial.printf("%S:Network Session Key is %u\n", TAG, NSK);
+        Serial.printf("%S:Application Session Key is %u\n", TAG, ASK);
+        Serial.printf("%S:Device Address is %u\n", TAG, DEVADDR);
+
+        //comparision to correct keys
+        Serial.printf("%s:Correct keys for comparision\n",TAG);
+        Serial.printf("%S:Network Session Key is %u\n", TAG, NWKSKEY);
+        Serial.printf("%S:Application Session Key is %u\n", TAG, APPSKEY);
+        Serial.printf("%S:Device Address is %u\n", TAG, DEVADDR1);
     #endif
     } else {
         #if LOG_LEVEL > 0
@@ -89,7 +99,7 @@ void lora_initialize(void * parameter){
             Serial.printf("%S:Device Address is %u\n", TAG, DEVADDR);
         #endif
     }
-    LMIC_setSession (0x1, DEVADDR1, NWKSKEY, APPSKEY);
+    //LMIC_setSession (0x1, DEVADDR1, NWKSKEY, APPSKEY);
 
     // define additional channels
     /*
@@ -118,6 +128,7 @@ void lora_initialize(void * parameter){
     //call lora_send once to enable scheduled data transfer
     lora_send(&sendjob);
     wifi_setlog("LMIC Bibliothek initialisiert");
+    updateWebpage("data_state_lmic;Initialisiert");
 
     //determin how long the process shall be blocked every loop cycle
     const TickType_t xDelay = 1 / portTICK_PERIOD_MS;

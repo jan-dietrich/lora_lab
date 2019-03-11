@@ -21,4 +21,9 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 //sets the website log
 void wifi_setlog(String log);
 
+//updates the user webpage when socket ist established
+void updateWebpage(String data);
+
+//decodes incoming webcmd from user
+void decode_webcmd(char * data);
 #endif

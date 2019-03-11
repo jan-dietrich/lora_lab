@@ -40,4 +40,5 @@
 #define WIFI_PASSWD                     "12345678"
 
 #define MAX_LOG_NUMBER                  5       // number of log entries
+#define WEB_BUFFER                      1000     // number of bytes that the webserver buffer is long
 #endif

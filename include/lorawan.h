@@ -19,7 +19,7 @@ typedef struct {
 void lora_initialize(void * parameter);
 
 // is used to activate abp mode and set the correct keys
-void lora_setabpkeys(u1_t NSK[16], u1_t ASK[16], u4_t DEVADDR);
+void lora_setabpkeys(u1_t* web_NSK, u1_t* web_ASK, u4_t* web_DEVADDR);
 
 // is used to activate otaa mode and set the correct keys
 void lora_setotaakeys(u1_t APPEUI[8], u1_t DEVEUI[8], u1_t APPKEY[16]);
