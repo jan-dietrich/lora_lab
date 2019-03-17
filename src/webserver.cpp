@@ -179,4 +179,9 @@ else if (0 == strcmp(ptr,"data_send")){
 else if (0 == strcmp(ptr,"data_lmic_reset")){
   xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
 }
+else if (0 == strcmp(ptr,"data_decode")){
+  char* decode = strtok(NULL, ";");
+  if (0 == strcmp(decode,"setDecodeRaw")){set_decode_mode(0);}
+  else if (0 == strcmp(decode,"setDecodeASCII")){set_decode_mode(1);}
+}
 }

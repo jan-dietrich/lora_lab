@@ -19,7 +19,6 @@
  
             var data = "data_keys_abp;" + NSK + ";" + ASK + ";" + DEVADDR + ";";
             ws.send(data);
-            alert("ABP Keys gesetzt");
          }
 		 function setKeysOTAA(){
             var DEUI = document.getElementById("KeysOTAADEUI").value;
@@ -34,6 +33,10 @@
          function LMICOTAA(){ws.send("data_lmic_otaa");}
          function sendData(){ws.send("data_send");}
          function LMICReset(){ws.send("data_lmic_reset");}
+         function setDecode(evt){
+            var data = "data_decode;" + evt + ";";
+            ws.send(data);
+        }
     </script>
 </head>
 <body>
@@ -94,12 +97,12 @@ Als Zugang für das LoRaWAN Netz wird das TTN verwendet. Die Zugangsdaten könne
   	<tr>
   		<td width="200px">Network Session Key</td>
         <td><input type = "text" id = "KeysABPNSK"></input></td>
-        <td>MSB { 0xAA, ... , 0xDD }</td>
+        <td>MSB AABBCCDD...</td>
     </tr>	
     <tr>
   		<td>Application Session Key</td>
         <td><input type = "text" id = "KeysABPASK"></input></td>
-        <td>MSB { 0xAA, ... , 0xDD }</td>
+        <td>MSB AABBCCDD...</td>
     </tr>
     <tr>
   		<td>Device Address</td>
@@ -146,6 +149,10 @@ Spreizfaktor:
     <button class="button" onclick = "setSF(this)" id = "setSF10Button">SF10</button>
     <button class="button" onclick = "setSF(this)" id = "setSF11Button">SF11</button>
     <button class="button" onclick = "setSF(this)" id = "setSF12Button">SF12</button>
+</div>
+Dekodierung der empfangenen Daten: 
+	<button class="button" onclick = "setDecode(id)" id = "setDecodeRaw">Rohdaten</button>
+    <button class="button" onclick = "setDecode(id)" id = "setDecodeASCII">ASCII</button>
 </div>
 <div class="section">
 <h3>4. Daten in die Warteschlange einreihen</h3>

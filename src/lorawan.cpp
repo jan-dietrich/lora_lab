@@ -60,7 +60,7 @@ void lora_setabpkeys(u1_t* web_NSK, u1_t* web_ASK, u4_t* web_DEVADDR){
     for (int i=0;i <16; i++){
         ASK[i]=web_ASK[i];
     }
-    
+    DEVADDR = *web_DEVADDR;
     #if LOG_LEVEL > 2
         Serial.printf("%s:NSK after memcpy set to: ", TAG);
         for (int i=0;i < 16; i++){
@@ -74,8 +74,6 @@ void lora_setabpkeys(u1_t* web_NSK, u1_t* web_ASK, u4_t* web_DEVADDR){
         Serial.printf("\n");
         Serial.printf("%s:Device Address set to %u\n", TAG, DEVADDR);
     #endif
-    
-    DEVADDR = *web_DEVADDR;
     wifi_setlog("ABP Keys gesetzt");
 }
 
@@ -119,7 +117,7 @@ void lora_initialize(void * parameter){
     //LMIC_setSession (0x1, DEVADDR1, NWKSKEY, APPSKEY);
 
     // define additional channels
-    /*
+    
     LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
     LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI);      // g-band
     LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
@@ -129,7 +127,7 @@ void lora_initialize(void * parameter){
     LMIC_setupChannel(6, 867700000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
     LMIC_setupChannel(7, 867900000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
     LMIC_setupChannel(8, 868800000, DR_RANGE_MAP(DR_FSK,  DR_FSK),  BAND_MILLI);      // g2-band
-    */
+    
     // Disable link check validation
     LMIC_setLinkCheckMode(0);
 
@@ -141,6 +139,9 @@ void lora_initialize(void * parameter){
 
     // Set data rate and transmit power for uplink (note: txpow seems to be ignored by the library)
     LMIC_setDrTxpow(DR_SF7,14);
+    updateWebpage("data_state_sf;SF7");
+    updateWebpage("data_state_bw;125kHz");
+    updateWebpage("data_state_cr;4/5");
 
     //call lora_send once to enable scheduled data transfer
     lora_send(&sendjob);
