@@ -154,7 +154,7 @@ void lora_initialize(void * parameter){
     LMIC_setClockError(MAX_CLOCK_ERROR * MAX_CLOCK_ERROR_PERCENTAGE / 100); // may be used if no downlink is received. Helps to correct bad clock
 
     if (lmic_mode == 0){
-    updateWebpage("data_state_lmic;ABP Modus");
+    updateWebpage("data_state_lmicmode;ABP Modus");
     //Set session
     if ((NSK != 0 ) & (ASK != 0) & (DEVADDR != 0)){
     LMIC_setSession (0x1, DEVADDR, NSK, ASK);
@@ -196,7 +196,7 @@ void lora_initialize(void * parameter){
     updateWebpage("data_state_cr;4/5");
 
     if (lmic_mode == 1){
-        updateWebpage("data_state_lmic;OTAA Modus");
+        updateWebpage("data_state_lmicmode;OTAA Modus");
         if (!LMIC_startJoining()) { // start joining
         #if LOG_LEVEL > 0
             Serial.printf("%s:already joined\n",TAG);
@@ -204,6 +204,8 @@ void lora_initialize(void * parameter){
         wifi_setlog("Bereits gejoined");
         }
     }
+
+    updateWebpage("data_state_lmic;Initialisiert");
     //call lora_send once to enable scheduled data transfer
     lora_send(&sendjob);
     wifi_setlog("LMIC Bibliothek initialisiert");

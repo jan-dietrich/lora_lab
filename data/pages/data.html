@@ -1,5 +1,7 @@
 <link rel="stylesheet" href="style.css">
 <div class="content_page">
     <h1>Daten</h1>
+    <important>Es muss ein Downlink von TTN erfolgen! Sonst h&aumlngt sich LMIC auf</important><br />
+    Falls der Zustand TXRXPEND eintritt (LMIC noch busy), muss der Programmstack zur&uumlckgesetzt werden<br />
     <button class="button" onclick="sendData()" id="sendDataButton">Daten an TTN senden</button>
 </div>
