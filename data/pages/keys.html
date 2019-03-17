@@ -1,0 +1,45 @@
+<link rel="stylesheet" href="style.css">
+<div class="content_page">
+    <h1>TTN Zugangsdaten</h1>
+    Als Zugang f&uumlr das LoRaWAN Netz wird das TTN verwendet. Die Zugangsdaten k&oumlnnen der Konsole entnommen werden <br />
+    <warning>Es wird zwischen ABP und OTAA Zugang entschieden. Es werden unterschiedliche Keys ben&oumltigt</warning><br />
+    <h2>Zugang via ABP</h2>
+    <table>
+        <tr>
+            <td width="200px">Network Session Key</td>
+            <td><input type="text" id="KeysABPNSK"></input></td>
+            <td>MSB AABBCCDD...</td>
+        </tr>
+        <tr>
+            <td>Application Session Key</td>
+            <td><input type="text" id="KeysABPASK"></input></td>
+            <td>MSB AABBCCDD...</td>
+        </tr>
+        <tr>
+            <td>Device Address</td>
+            <td><input type="text" id="KeysABPDEVADDR"></input></td>
+            <td>1234567A</td>
+        </tr>
+    </table>
+    <button class="button" onclick="setKeysABP()" id="setKeysABPButton">ABP Keys setzen</button>
+    <br />
+    <h2>Zugang via OTAA</h2>
+    <table>
+        <tr>
+            <td width="200px">Device EUI</td>
+            <td><input type="text" id="KeysOTAADEUI"></input></td>
+            <td><important>LSB</important> DDBBCCAA...</td>
+        </tr>
+        <tr>
+            <td>Application EUI</td>
+            <td><input type="text" id="KeysOTAAAEUI"></input></td>
+            <td><important>LSB</important> DDCCBBAA...</td>
+        </tr>
+        <tr>
+            <td>App Key</td>
+            <td><input type="text" id="KeysOTAAAPPKEY"></input></td>
+            <td><important>MSB</important> AABBCCDD...</td>
+        </tr>
+    </table>
+    <button class="button" onclick="setKeysOTAA()" id="setKeysOTAAButton">OTAA Keys setzen</button>
+</div>

@@ -1,11 +1,13 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<link rel="stylesheet" href="style.css">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>DHBW LoRa</title>
+    <script src="jquery-3.3.1.min.js"></script>
     <script type = "text/javascript">
         var ws = new WebSocket("ws://192.168.4.1/socket");
+		
         //data from websocket
         ws.onmessage = function(evt) {
             var datahandler = evt.data.split(';');
@@ -37,126 +39,71 @@
             var data = "data_decode;" + evt + ";";
             ws.send(data);
         }
+		
     </script>
+    <script>
+		$(document).ready( function() {
+    		$("#load_home").on("click", function() {
+        	$("#div_content").load("pages/home.html");
+            });
+            $("#load_keys").on("click", function () {
+                $("#div_content").load("pages/keys.html");
+            });
+            $("#load_lmic").on("click", function () {
+                $("#div_content").load("pages/lmic.html");
+            });
+            $("#load_parameter").on("click", function () {
+                $("#div_content").load("pages/parameter.html");
+            });
+            $("#load_data").on("click", function () {
+                $("#div_content").load("pages/data.html");
+            });
+		});
+</script>
 </head>
 <body>
-<div class="header">
-    <img src="img/dhbw_logo.png" alt="dhbw logo">
-    <div class="float-right">
-        <h1>LoRaWAN Versuchsaufbau</h1></br>
-        <h2>by Jan Dietrich &copy 2019</h2>
-    </div>
-</div>
-<hr />
-
-<div class="section">
-<h3>Aktueller Status des Boards 
-<div class="float-right">
-Log
-</div>
-</h3>
-<div class="float-right">
-<p id="data_log">Keine Einträge</p>
-</div>
-
-<table>
-<tr>
-<td width="300px">
-<table>
-	<tr>
-    	<td>LMIC Stack:</td><td id="data_state_lmic">Reset Zustand</td>
-    </tr>
-    <tr>
-    	<td>Modus:</td><td id="data_state_lmicmode">Nicht gesetzt</td>
-    </tr>
-    <tr>
-        <td>Spreizfaktor:</td><td id="data_state_sf">Kein SF</td>
-    </tr>
-    <tr>
-    	<td>Coderate:</td><td id="data_state_cr">Keine CR</td>
-    </tr>
-    <tr>
-    	<td>Bandbreite:</td><td id="data_state_bw">Keine BW</td>
-    </tr>
-</table>
-</td>
-<td>
-<button class="button" onclick = "LMICReset()" id = "LMICResetButton">LMIC zurücksetzen</button>
-</td>
-</tr>
-</table> <br />
-<important>Die folgenden Einstellung müssen nacheinander durchgearbeitet werden!</important>
-</div>
-<div class="section">
-<h3>1. Zugangsdaten</h3>
-Als Zugang für das LoRaWAN Netz wird das TTN verwendet. Die Zugangsdaten können der Konsole entnommen werden <br/>
-<warning>Es wird zwischen ABP und OTAA Zugang entschieden. Es werden unterschiedliche Keys benötigt</warning><br />
-<details>
-  <summary>Zugang via ABP</summary>
-  <table>
-  	<tr>
-  		<td width="200px">Network Session Key</td>
-        <td><input type = "text" id = "KeysABPNSK"></input></td>
-        <td>MSB AABBCCDD...</td>
-    </tr>	
-    <tr>
-  		<td>Application Session Key</td>
-        <td><input type = "text" id = "KeysABPASK"></input></td>
-        <td>MSB AABBCCDD...</td>
-    </tr>
-    <tr>
-  		<td>Device Address</td>
-        <td><input type = "text" id = "KeysABPDEVADDR"></input></td>
-        <td>1234567A</td>
-    </tr>
-  </table>
-  <button class="button" onclick = "setKeysABP()" id = "setKeysABPButton">ABP Keys setzen</button>
-</details><br />
-<details>
-  <summary>Zugang via OTAA</summary>
-  <table>
-  	<tr>
-  		<td width="200px">Device EUI</td>
-        <td><input type = "text" id = "KeysOTAADEUI"></input></td>
-        <td><important>LSB</important> { 0xAA, ... , 0xDD }</td>
-    </tr>	
-    <tr>
-  		<td>Application EUI</td>
-        <td><input type = "text" id = "KeysOTAAAEUI"></input></td>
-        <td><important>LSB</important> { 0xAA, ... , 0xDD }</td>
-    </tr>
-    <tr>
-  		<td>App Key</td>
-        <td><input type = "text" id = "KeysOTAAAPPKEY"></input></td>
-        <td><important>MSB</important> { 0xAA, ... , 0xDD }</td>
-    </tr>
-  </table>
-  <button class="button" onclick = "setKeysOTAA()" id = "setKeysOTAAButton">OTAA Keys setzen</button>
-</details>
-</div>
-<div class="section">
-<h3>2. LMIC initialisieren</h3>
-<important>Es müssen zunächst die richtigen Keys gesetzt werden! Sonst crashed der Prozessor!</important><br />
-<button class="button" onclick = "LMICABP()" id = "LMICABPButton">LMIC im ABP Modus starten</button>
-<button class="button" onclick = "LMICOTAA()" id = "LMICOTAAButton">LMIC im OTAA Modus starten</button>
-</div>
-<div class="section">
-<h3>3. Übertragungsparameter verändern</h3>
-Spreizfaktor: 
-	<button class="button" onclick = "setSF(this)" id = "setSF7Button">SF7</button>
-    <button class="button" onclick = "setSF(this)" id = "setSF8Button">SF8</button>
-    <button class="button" onclick = "setSF(this)" id = "setSF9Button">SF9</button>
-    <button class="button" onclick = "setSF(this)" id = "setSF10Button">SF10</button>
-    <button class="button" onclick = "setSF(this)" id = "setSF11Button">SF11</button>
-    <button class="button" onclick = "setSF(this)" id = "setSF12Button">SF12</button>
-</div>
-Dekodierung der empfangenen Daten: 
-	<button class="button" onclick = "setDecode(id)" id = "setDecodeRaw">Rohdaten</button>
-    <button class="button" onclick = "setDecode(id)" id = "setDecodeASCII">ASCII</button>
-</div>
-<div class="section">
-<h3>4. Daten in die Warteschlange einreihen</h3>
-<button class="button" onclick = "sendData()" id = "sendDataButton">Daten an TTN senden</button>
-</div>
+	<div class="container">
+		<div class="header">
+        	<div class="float-left">
+            	<menu>
+  					<li id="load_home"><a class="href" href="#">Home</a></li>
+                    <li id="load_keys"><a class="hfef" href="#">Zugangsdaten</a></li>
+                    <li id="load_lmic"><a class="href" href="#">LMIC</a></li>
+  					<li id="load_parameter"><a class="href" href="#">Parameter</a></li>
+  					<li id="load_data"><a class="href" href="#">Daten</a></li>
+				</menu>
+            </div>
+            <div class="float-right">
+            	<img src="img/dhbw_logo.png" alt="dhbw logo" height="75px">
+            </div>
+        </div>
+        <div class="content" id="div_content">
+        	
+        </div>
+        <div class="footer">
+        	<div class="float-left">
+            	<table>
+					<tr>
+    					<td>LMIC Stack:</td><td id="data_state_lmic">Reset Zustand</td>
+    				</tr>
+    				<tr>
+    					<td>Modus:</td><td id="data_state_lmicmode">Nicht gesetzt</td>
+    				</tr>
+    				<tr>
+        				<td>Spreizfaktor:</td><td id="data_state_sf">Kein SF</td>
+    				</tr>
+    				<tr>
+    					<td>Coderate:</td><td id="data_state_cr">Keine CR</td>
+   					</tr>
+    				<tr>
+    					<td>Bandbreite:</td><td id="data_state_bw">Keine BW</td>
+    				</tr>
+				</table>
+            </div>
+            <div class="float-right">
+				<p id="data_log">Keine Einträge</p>
+			</div>
+        </div>
+	</div>
 </body>
 </html>

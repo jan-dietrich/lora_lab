@@ -1,26 +1,92 @@
-body {
+/* main class for grid layout */
+.container { 
+  	display: grid; 
+  	grid-template-rows:75px 1fr 150px; 
+	grid-template-areas:  
+    "header" 
+    "content" 
+    "footer" 
+    ;
 	font-family	: Helvetica, Arial, Geneva, sans-serif;	
-}
-h1 {
-	font-size 	: 36px;
-}
-h2 {
-	font-size	: 20px	
+	height: 98vh; 
 }
 
-.header {
-	padding-bottom: 20px;
-	vertical-align:top
+/* definition of page areas */
+.container .header {
+	grid-area: header;
+	display:grid;
+	grid-template-columns: 85% 15%;
+	grid-template-areas:  
+    "header-float-left header-float-right";
+	background-color:#7D8891;
+	align-items: center;
 }
 
-.float-right {
-	float: right;
+.container .content { 
+  	grid-area: content;
+	width:100%;
 }
 
-.section {
-margin-top: 40px;	
+.container .footer { 
+  	grid-area: footer;
+  	display:grid;
+	grid-template-columns: 50% 50%;
+	grid-template-areas:  
+    "footer-float-left footer-float-right";
 }
 
+/* header definitions */
+.container .header .float-left {
+	grid-area: header-float-left; 	
+}
+
+.container .header .float-right {
+	grid-area: header-float-right;	
+	justify-self: end;
+}
+
+/* footer definitions */
+.container .footer .float-left {
+	grid-area: footer-float-left; 	
+}
+
+.container .footer .float-right {
+	grid-area: footer-float-right;	
+	justify-self: end;
+}
+
+/* navigation bar */
+menu {
+  	list-style-type: none;
+  	margin: 0;
+  	padding: 0;
+  	overflow: hidden;
+}
+
+li {
+  	float: left;
+}
+
+li a {
+  	display: block;
+  	color: white;
+  	text-align: center;
+  	padding: 14px 16px;
+  	text-decoration: none;
+}
+
+li a:hover {
+  	background-color: #E1031D;
+}
+
+
+/* content */
+.content_page {
+	width:100%;
+	height:100%;
+}
+
+/* different text styles */
 info {
 	color:#090;
 }
@@ -34,6 +100,7 @@ important {
 	font-weight: bold;
 }
 
+/* button style */
 .button {
 	background-color:#7D8891;
 	padding: 10px 24px;
@@ -43,4 +110,15 @@ important {
 .button:hover {
   background-color: #E1031D;
   color: white;
+}
+
+/* media queries for responsive layout */
+@media screen and (max-width: 600px){
+  	menu li {float: none;}	
+	.container {
+		grid-template-rows:250px 1fr 100px;
+	}
+	.container .header {
+		grid-template-columns: 35% 65%;
+	}
 }

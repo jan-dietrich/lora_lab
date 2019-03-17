@@ -56,6 +56,26 @@ void wifi_initialize(){
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
   request->send(SPIFFS, "/index.html", "text/html");
   });
+  //other pages
+  server.on("/pages/data.html", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/pages/data.html", "text/html");
+  });
+  server.on("/pages/home.html", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/pages/home.html", "text/html");
+  });
+  server.on("/pages/keys.html", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/pages/keys.html", "text/html");
+  });
+  server.on("/pages/lmic.html", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/pages/lmic.html", "text/html");
+  });
+  server.on("/pages/parameter.html", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/pages/parameter.html", "text/html");
+  });
+  //jquery
+  server.on("/jquery-3.3.1.min.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/jquery-3.3.1.min.js", "text/javascript");
+  });
   //css stylesheet
   server.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/style.css", "text/css");
