@@ -22,13 +22,9 @@ QueueHandle_t LoraSendQueue;
 MessageBuffer_t SendBuffer; // contains MessageSize, MessagePort, Message[]
 
 // Keys for abp
-u1_t NSK[16] = "0"; //network session key
-u1_t ASK[16] = "0"; //application session key
+u1_t NSK[16] = { 0xA7, 0x60, 0xE8, 0xCE, 0x11, 0xE3, 0x22, 0x5C, 0x2B, 0x22, 0xB5, 0x7F, 0x06, 0x3B, 0x6F, 0x1B }; //network session key
+u1_t ASK[16] = { 0xA7, 0x59, 0xE8, 0xDE, 0x11, 0xE3, 0x22, 0x6C, 0x2B, 0x22, 0xB5, 0x9F, 0x06, 0x3B, 0xFF, 0x1B }; //application session key
 u4_t DEVADDR = 0; //device addresss
-
-u1_t NWKSKEY[16] = { 0xA7, 0x59, 0xE8, 0xCE, 0x11, 0xE3, 0x22, 0x6C, 0x2B, 0x22, 0xB5, 0x7F, 0x06, 0x3B, 0xFF, 0x1B };
-u1_t APPSKEY[16] = { 0xF7, 0x63, 0xDE, 0x9B, 0xD8, 0xBF, 0x2E, 0x25, 0xE1, 0xEE, 0xA4, 0xE1, 0x90, 0x2D, 0x04, 0x6F };
-u4_t DEVADDR1 = 0x26011C08 ;
 
 // Keys for otaa
 // must be defined empty even if abp is used
@@ -45,15 +41,41 @@ const lmic_pinmap lmic_pins = {
 };
 
 void lora_setabpkeys(u1_t* web_NSK, u1_t* web_ASK, u4_t* web_DEVADDR){
-    memcpy(NSK,web_NSK,sizeof(NSK));
-    memcpy(ASK,web_ASK,sizeof(ASK));
-    memcpy(&DEVADDR,web_DEVADDR,sizeof(DEVADDR));
-
-    #if LOG_LEVEL > 2
-        Serial.printf("%S:Network Session Key set to %u\n", TAG, NSK);
-        Serial.printf("%S:Application Session Key set to %u\n", TAG, ASK);
-        Serial.printf("%S:Device Address set to %u\n", TAG, DEVADDR);
+    #if LOG_LEVEL > 3
+        Serial.printf("%s:web_NSK before memcpy set to: ", TAG);
+        for (int i=0;i < 16; i++){
+            Serial.printf("%u ", web_NSK[i]);
+        }
+        Serial.printf("\n");
+        Serial.printf("%s:web_ASK before memcpy set to: ", TAG);
+        for (int i=0;i < 16; i++){
+            Serial.printf("%u ", web_ASK[i]);
+        }
+        Serial.printf("\n");
     #endif
+    
+    for (int i=0;i <16; i++){
+        NSK[i]=web_NSK[i];
+    }
+    for (int i=0;i <16; i++){
+        ASK[i]=web_ASK[i];
+    }
+    
+    #if LOG_LEVEL > 2
+        Serial.printf("%s:NSK after memcpy set to: ", TAG);
+        for (int i=0;i < 16; i++){
+            Serial.printf("%u ", NSK[i]);
+        }
+        Serial.printf("\n");
+        Serial.printf("%s:ASK after memcpy set to: ", TAG);
+        for (int i=0;i < 16; i++){
+            Serial.printf("%u ", ASK[i]);
+        }
+        Serial.printf("\n");
+        Serial.printf("%s:Device Address set to %u\n", TAG, DEVADDR);
+    #endif
+    
+    DEVADDR = *web_DEVADDR;
     wifi_setlog("ABP Keys gesetzt");
 }
 
@@ -85,11 +107,6 @@ void lora_initialize(void * parameter){
         Serial.printf("%S:Application Session Key is %u\n", TAG, ASK);
         Serial.printf("%S:Device Address is %u\n", TAG, DEVADDR);
 
-        //comparision to correct keys
-        Serial.printf("%s:Correct keys for comparision\n",TAG);
-        Serial.printf("%S:Network Session Key is %u\n", TAG, NWKSKEY);
-        Serial.printf("%S:Application Session Key is %u\n", TAG, APPSKEY);
-        Serial.printf("%S:Device Address is %u\n", TAG, DEVADDR1);
     #endif
     } else {
         #if LOG_LEVEL > 0

@@ -131,14 +131,36 @@ if (0 == strcmp(ptr,"data_keys_abp")){
   char* web_DEVADDR = strtok(NULL, ";");
 
   //cast char* to unsigned int (aka u4_t)
-  unsigned int web_DEVADDR_int = (unsigned int)web_DEVADDR;
+  u4_t web_DEVADDR_int = (uint32_t)strtol(web_DEVADDR, NULL, 16);
+
+  //convert NSK and ASK
+  u1_t web_NSK_char[16];
+  u1_t web_ASK_char[16];
+  char buffer[2];
+
+  for(int i = 0; i < 16; i++){
+    buffer[0] = web_NSK[i*2];
+    buffer[1] = web_NSK[i*2+1];
+    web_NSK_char[i] = (uint8_t)strtol(buffer, NULL, 16);
+    #if LOG_LEVEL > 3
+    Serial.printf("%s:interpreted %c%c as %u\n",TAG,buffer[0],buffer[1],web_NSK_char[i]);
+    #endif
+  }
+  for(int i = 0; i < 16; i++){
+    buffer[0] = web_ASK[i*2];
+    buffer[1] = web_ASK[i*2+1];
+    web_ASK_char[i] = (uint8_t)strtol(buffer, NULL, 16);
+    #if LOG_LEVEL > 3
+    Serial.printf("%s:interpreted %c%c as %u\n",TAG,buffer[0],buffer[1],web_ASK_char[i]);
+    #endif
+  }
 
   #if LOG_LEVEL > 2
     Serial.printf("%s:NSK=%s\n",TAG,web_NSK);
     Serial.printf("%s:ASK=%s\n",TAG,web_ASK);
     Serial.printf("%s:DEVADDR=%s\n",TAG,web_DEVADDR);
   #endif
-  lora_setabpkeys((unsigned char*)web_NSK, (unsigned char*)web_ASK, &web_DEVADDR_int);
+  lora_setabpkeys(web_NSK_char, web_ASK_char, &web_DEVADDR_int);
 }
 else if (0 == strcmp(ptr,"data_lmic_abp")){
   xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
