@@ -15,6 +15,10 @@ typedef struct {
   uint8_t Message[SEND_BUFFER_SIZE];
 } MessageBuffer_t;
 
+//defines the mode lmic is started with
+//default is ABP
+void lora_setmode(int mode);
+
 // initializes the lora module and sets the correct channels
 void lora_initialize(void * parameter);
 
@@ -22,7 +26,7 @@ void lora_initialize(void * parameter);
 void lora_setabpkeys(u1_t* web_NSK, u1_t* web_ASK, u4_t* web_DEVADDR);
 
 // is used to activate otaa mode and set the correct keys
-void lora_setotaakeys(u1_t APPEUI[8], u1_t DEVEUI[8], u1_t APPKEY[16]);
+void lora_setotaakeys(u1_t* web_APPEUI, u1_t* web_DEVEUI, u1_t* web_APPKEY);
 
 // gets called on event from LMIC
 // name can not be changed as LMIC is not working otherwise

@@ -188,12 +188,59 @@ if (0 == strcmp(ptr,"data_keys_abp")){
   display_update(1,(char*)"ABP");
   lora_setabpkeys(web_NSK_char, web_ASK_char, &web_DEVADDR_int);
 }
+else if (0 == strcmp(ptr,"data_keys_otaa")){
+  char* web_APPEUI = strtok(NULL, ";");
+  char* web_DEVEUI = strtok(NULL, ";");
+  char* web_APPKEY = strtok(NULL, ";");
+
+  //convert APPEUI DEVEUI and APPKEY
+  u1_t web_APPEUI_char[8];
+  u1_t web_DEVEUI_char[8];
+  u1_t web_APPKEY_char[16];
+  char buffer[2];
+
+  for(int i = 0; i < 8; i++){
+    buffer[0] = web_APPEUI[i*2];
+    buffer[1] = web_APPEUI[i*2+1];
+    web_APPEUI_char[i] = (uint8_t)strtol(buffer, NULL, 16);
+    #if LOG_LEVEL > 3
+    Serial.printf("%s:interpreted %c%c as %u\n",TAG,buffer[0],buffer[1],web_APPEUI_char[i]);
+    #endif
+  }
+  for(int i = 0; i < 8; i++){
+    buffer[0] = web_DEVEUI[i*2];
+    buffer[1] = web_DEVEUI[i*2+1];
+    web_DEVEUI_char[i] = (uint8_t)strtol(buffer, NULL, 16);
+    #if LOG_LEVEL > 3
+    Serial.printf("%s:interpreted %c%c as %u\n",TAG,buffer[0],buffer[1],web_DEVEUI_char[i]);
+    #endif
+  }
+  for(int i = 0; i < 16; i++){
+    buffer[0] = web_APPKEY[i*2];
+    buffer[1] = web_APPKEY[i*2+1];
+    web_APPKEY_char[i] = (uint8_t)strtol(buffer, NULL, 16);
+    #if LOG_LEVEL > 3
+    Serial.printf("%s:interpreted %c%c as %u\n",TAG,buffer[0],buffer[1],web_APPKEY_char[i]);
+    #endif
+  }
+
+  #if LOG_LEVEL > 2
+    Serial.printf("%s:APPEUI=%s\n",TAG,web_APPEUI);
+    Serial.printf("%s:DEVEUI=%s\n",TAG,web_DEVEUI);
+    Serial.printf("%s:APPKEY=%s\n",TAG,web_APPKEY);
+  #endif
+  display_update(1,(char*)"ABP");
+  lora_setotaakeys(web_APPEUI_char, web_DEVEUI_char, web_APPKEY_char);
+}
 else if (0 == strcmp(ptr,"data_lmic_abp")){
+  lora_setmode(0);
   xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
   display_update(2,(char*)"-");
 }
 else if (0 == strcmp(ptr,"data_lmic_otaa")){
-  //xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
+  lora_setmode(1);
+  xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
+  display_update(2,(char*)"-");
 }
 else if (0 == strcmp(ptr,"data_send")){
   //prepare data for LoRa

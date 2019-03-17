@@ -26,11 +26,17 @@ u1_t NSK[16] = { 0xA7, 0x60, 0xE8, 0xCE, 0x11, 0xE3, 0x22, 0x5C, 0x2B, 0x22, 0xB
 u1_t ASK[16] = { 0xA7, 0x59, 0xE8, 0xDE, 0x11, 0xE3, 0x22, 0x6C, 0x2B, 0x22, 0xB5, 0x9F, 0x06, 0x3B, 0xFF, 0x1B }; //application session key
 u4_t DEVADDR = 0; //device addresss
 
-// Keys for otaa
+//keys for otaa
+u1_t APPEUI[8]={ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };  //application eui
+u1_t DEVEUI[8]={ 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };  //device eui
+u1_t APPKEY[16] = { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C };   //application key
 // must be defined empty even if abp is used
 void os_getArtEui (u1_t* buf) { }
 void os_getDevEui (u1_t* buf) { }
 void os_getDevKey (u1_t* buf) { }
+
+//default mode is abp
+int lmic_mode = 0;
 
 // Pin mapping
 const lmic_pinmap lmic_pins = {
@@ -77,6 +83,56 @@ void lora_setabpkeys(u1_t* web_NSK, u1_t* web_ASK, u4_t* web_DEVADDR){
     wifi_setlog("ABP Keys gesetzt");
 }
 
+void lora_setotaakeys(u1_t* web_APPEUI, u1_t* web_DEVEUI, u1_t* web_APPKEY){
+    #if LOG_LEVEL > 3
+        Serial.printf("%s:web_APPEUI before memcpy set to: ", TAG);
+        for (int i=0;i < 8; i++){
+            Serial.printf("%u ", web_APPEUI[i]);
+        }
+        Serial.printf("\n");
+        Serial.printf("%s:web_DEVEUI before memcpy set to: ", TAG);
+        for (int i=0;i < 8; i++){
+            Serial.printf("%u ", web_DEVEUI[i]);
+        }
+        Serial.printf("\n");
+        Serial.printf("%s:web_APPKEY before memcpy set to: ", TAG);
+        for (int i=0;i < 8; i++){
+            Serial.printf("%u ", web_APPKEY[i]);
+        }
+        Serial.printf("\n");
+    #endif
+
+    for (int i=0;i <8; i++){
+        APPEUI[i]=web_APPEUI[i];
+    }
+    for (int i=0;i <8; i++){
+        DEVEUI[i]=web_DEVEUI[i];
+    }
+    for (int i=0;i <16; i++){
+        APPKEY[i]=web_APPKEY[i];
+    }
+    #if LOG_LEVEL > 2
+        Serial.printf("%s:APPEUI after memcpy set to: ", TAG);
+        for (int i=0;i < 8; i++){
+            Serial.printf("%u ", APPEUI[i]);
+        }
+        Serial.printf("\n");
+        Serial.printf("%s:DEVEUI after memcpy set to: ", TAG);
+        for (int i=0;i < 8; i++){
+            Serial.printf("%u ", DEVEUI[i]);
+        }
+        Serial.printf("\n");
+        Serial.printf("%s:APPKEY after memcpy set to: ", TAG);
+        for (int i=0;i < 16; i++){
+            Serial.printf("%u ", APPKEY[i]);
+        }
+        Serial.printf("\n");
+    #endif
+    wifi_setlog("OTAA Keys gesetzt");
+}
+
+void lora_setmode(int mode) {lmic_mode = mode;}
+
 // initializes the lora module and sets the correct channels
 void lora_initialize(void * parameter){
     LoraSendQueue = xQueueCreate(SEND_QUEUE_SIZE, sizeof(MessageBuffer_t));
@@ -96,6 +152,8 @@ void lora_initialize(void * parameter){
     LMIC_reset();
     LMIC_setClockError(MAX_CLOCK_ERROR * MAX_CLOCK_ERROR_PERCENTAGE / 100); // may be used if no downlink is received. Helps to correct bad clock
 
+    if (lmic_mode == 0){
+        updateWebpage("data_state_lmic;ABP Modus");
     //Set session
     if ((NSK != 0 ) & (ASK != 0) & (DEVADDR != 0)){
     LMIC_setSession (0x1, DEVADDR, NSK, ASK);
@@ -114,7 +172,16 @@ void lora_initialize(void * parameter){
             Serial.printf("%S:Device Address is %u\n", TAG, DEVADDR);
         #endif
     }
-    //LMIC_setSession (0x1, DEVADDR1, NWKSKEY, APPSKEY);
+    }
+    else if (lmic_mode == 1){
+        updateWebpage("data_state_lmic;OTAA Modus");
+        if (!LMIC_startJoining()) { // start joining
+        #if LOG_LEVEL > 0
+            Serial.printf("%s:already joined\n",TAG);
+        #endif
+        wifi_setlog("Bereits gejoined");
+        }
+    }
 
     // define additional channels
     
@@ -146,7 +213,6 @@ void lora_initialize(void * parameter){
     //call lora_send once to enable scheduled data transfer
     lora_send(&sendjob);
     wifi_setlog("LMIC Bibliothek initialisiert");
-    updateWebpage("data_state_lmic;Initialisiert");
 
     //determin how long the process shall be blocked every loop cycle
     const TickType_t xDelay = 1 / portTICK_PERIOD_MS;
@@ -239,6 +305,7 @@ void onEvent(ev_t ev) {
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_JOINED\n", TAG);
             #endif
+            LMIC_setLinkCheckMode(0);
             wifi_setlog("Event empfangen: Joined");
             display_update(2,(char*)"EV_JOINED");
             break;
