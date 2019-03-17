@@ -62,6 +62,7 @@ void display_update(int display_mode, char data[15]){
             u8x8.drawString(0, 4, (char*)data);
             break;
         default:
+            u8x8.drawString(0, 0, "Fehler");
             break;
     }
     

@@ -17,7 +17,7 @@
 //  ESP_LOG_INFO = 3
 //  ESP_LOG_DEBUG = 4
 //  ESP_LOG_VERBOSE = 5
-#define LOG_LEVEL                       3
+#define LOG_LEVEL                       5
 
 // Pins for LoRa Component
 // For detailed pin description visit GitHub of Arduino LMIC
@@ -33,7 +33,7 @@
 #define PAYLOAD_BUFFER_SIZE             50      // maximum size of payload block per transmit
 #define SEND_QUEUE_SIZE                 10      // maximum number of messages in payload send queue [1 = no queue]
 #define SEND_BUFFER_SIZE                50      // size of sendbuffer
-#define MAX_CLOCK_ERROR_PERCENTAGE      3       // determins the allowed clock error (shall be < 7)
+#define MAX_CLOCK_ERROR_PERCENTAGE      7       // determins the allowed clock error (shall be < 7)
 
 // WiFi config
 #define WIFI_SSID                       "Test_WiFi"

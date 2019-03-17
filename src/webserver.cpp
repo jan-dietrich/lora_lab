@@ -12,6 +12,9 @@ AsyncWebServer server(80);
 //data that is send to lora
 uint8_t mydata[] = "Hello, world!";
 
+//handle for RTOS LMIC task
+TaskHandle_t pvLMICTask = NULL;
+
 //open up websocket to handle JavaScript requests from buttons
 AsyncWebSocket ws("/socket");
 AsyncWebSocketClient * globalClient = NULL;
@@ -229,18 +232,18 @@ else if (0 == strcmp(ptr,"data_keys_otaa")){
     Serial.printf("%s:DEVEUI=%s\n",TAG,web_DEVEUI);
     Serial.printf("%s:APPKEY=%s\n",TAG,web_APPKEY);
   #endif
-  display_update(1,(char*)"ABP");
+  display_update(1,(char*)"OTAA");
   lora_setotaakeys(web_APPEUI_char, web_DEVEUI_char, web_APPKEY_char);
 }
 else if (0 == strcmp(ptr,"data_lmic_abp")){
   lora_setmode(0);
-  xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
   display_update(2,(char*)"-");
+  xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, &pvLMICTask, 1);
 }
 else if (0 == strcmp(ptr,"data_lmic_otaa")){
   lora_setmode(1);
-  xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
   display_update(2,(char*)"-");
+  xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, &pvLMICTask, 1);
 }
 else if (0 == strcmp(ptr,"data_send")){
   //prepare data for LoRa
@@ -251,7 +254,21 @@ else if (0 == strcmp(ptr,"data_send")){
   lora_enqueuedata(&SendBuffer);
 }
 else if (0 == strcmp(ptr,"data_lmic_reset")){
-  xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
+  if( pvLMICTask != NULL )
+    {
+         vTaskDelete(pvLMICTask);
+         display_update(1,(char*)"Nach Reset");
+         #if LOG_LEVEL > 2
+         Serial.printf("%s:LMIC Reset\n",TAG);
+         #endif
+         wifi_setlog("LMIC zur&uumlckgesetzt!");
+    }
+  else {
+    #if LOG_LEVEL > 0
+      Serial.printf("%s:LMIC could not be reset",TAG);
+    #endif
+    wifi_setlog("LMIC konnte nicht zur&uumlckgesetzt werden!");
+  }
 }
 else if (0 == strcmp(ptr,"data_decode")){
   char* decode = strtok(NULL, ";");

@@ -1,7 +1,12 @@
 <link rel="stylesheet" href="style.css">
 <div class="content_page">
     <h1>LMIC Bibliothek</h1>
+    <h2>LMIC starten</h2>
     <important>Es m&uumlssen zun&aumlchst die richtigen Keys gesetzt werden! Sonst crashed der Prozessor!</important><br />
     <button class="button" onclick="LMICABP()" id="LMICABPButton">LMIC im ABP Modus starten</button>
     <button class="button" onclick="LMICOTAA()" id="LMICOTAAButton">LMIC im OTAA Modus starten</button>
+    <h2>LMIC Reset</h2>
+    <important>Im Fehlerfall kann der LMIC Softwarestack zur&uumlgesetzt werden</important><br />
+    Alle Schritt ab Starten des LMIC Softwarestacks m&uumlen wiederholt werden!<br />
+    <button class="button" onclick="LMICReset()" id="LMICResetButton">LMIC Reset</button>
 </div>
