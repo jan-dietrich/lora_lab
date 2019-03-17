@@ -30,12 +30,11 @@ Serial.printf("%s:Debugging Level is set to: %i\n",TAG, LOG_LEVEL);
 Serial.printf("%s:Currently running %s in version %s\n",TAG, ESPNAME, PROGVERSION);
 #endif
 
-//initialize lora
-//xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
-
 //wifi setup
-//xTaskCreatePinnedToCore(wifi_initialize, "wifi_initialize", 16384, NULL, 4, NULL, 0);
 wifi_initialize();
+
+//display setup
+display_initialize();
 }
 
 void loop() {

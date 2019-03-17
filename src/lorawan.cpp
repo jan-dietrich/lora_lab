@@ -197,7 +197,7 @@ void onEvent(ev_t ev) {
     #if LOG_LEVEL > 2
     Serial.printf("%s:Event received @:%d\n",TAG,os_getTime());
     #endif
-
+    
     // depending on event
     switch(ev) {
         case EV_SCAN_TIMEOUT:
@@ -205,54 +205,63 @@ void onEvent(ev_t ev) {
                 Serial.printf("%s:Event is EV_SCAN_TIMEOUT\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Timeout");
+            display_update(2,(char*)"EV_SCAN_TIMEOUT");
             break;
         case EV_BEACON_FOUND:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_BEACON_FOUND\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Beacon gefunden");
+            display_update(2,(char*)"EV_BEACON_FOUND");
             break;
         case EV_BEACON_MISSED:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_BEACON_MISSED\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Beacon verpasst");
+            display_update(2,(char*)"EV_BEACON_MISSED");
             break;
         case EV_BEACON_TRACKED:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_BEACON_TRACKED\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Beacon getracked");
+            display_update(2,(char*)"EV_BEACON_TRACKED");
             break;
         case EV_JOINING:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_JOINING\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Joining");
+            display_update(2,(char*)"EV_JOINING");
             break;
         case EV_JOINED:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_JOINED\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Joined");
+            display_update(2,(char*)"EV_JOINED");
             break;
         case EV_RFU1:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_RFU1\n", TAG);
             #endif
             wifi_setlog("Event empfangen: RFU1");
+            display_update(2,(char*)"EV_RFU1");
             break;
         case EV_JOIN_FAILED:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_JOIN_FAILED\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Join fehlgeschlagen");
+            display_update(2,(char*)"EV_JOIN_FAILED");
             break;
         case EV_REJOIN_FAILED:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_REJOIN_FAILED\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Rejoin fehlgeschlagen");
+            display_update(2,(char*)"EV_REJOIN_FAILED");
             break;
         case EV_TXCOMPLETE: 
             #if LOG_LEVEL > 2
@@ -267,41 +276,49 @@ void onEvent(ev_t ev) {
             #endif
             wifi_setlog("Event empfangen: TX abgeschlossen (einschließlich warten auf RX Fenster)");
             decode_message(LMIC.frame + LMIC.dataBeg, LMIC.dataLen);
+            display_update(2,(char*)"EV_TXCOMPLETE");
             break;
         case EV_LOST_TSYNC: 
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_LOST_TSYNC\n", TAG);
             #endif
+            wifi_setlog("Event empfangen: TSYNC verloren");
+            display_update(2,(char*)"EV_LOST_TSYNC");
             break;
         case EV_RESET:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_RESET\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Reset");
+            display_update(2,(char*)"EV_RESET");
             break;
         case EV_RXCOMPLETE:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_RXCOMPLETE\n", TAG);
             #endif
             wifi_setlog("Event empfangen: RX abgeschlossen");
+            display_update(2,(char*)"EV_RXCOMPLETE");
             break;
         case EV_LINK_DEAD:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_LINK_DEAD\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Link tot");
+            display_update(2,(char*)"EV_LINK_DEAD");
             break;
         case EV_LINK_ALIVE:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_LINK_ALIVE\n", TAG);
             #endif
             wifi_setlog("Event empfangen: Link am Leben");
+            display_update(2,(char*)"EV_LINK_ALIVE");
             break;
          default:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is unknown\n", TAG);
             #endif
             wifi_setlog("Unbekanntes Event empfangen");
+            display_update(2,(char*)"UNKNOWN");
             break;
     }
 }

@@ -84,6 +84,10 @@ void wifi_initialize(){
   server.on("/img/dhbw_logo.png", HTTP_GET, [](AsyncWebServerRequest *request){
   request->send(SPIFFS, "/img/dhbw_logo.png", "image/png");
   });
+  //favicon
+  server.on("/img/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
+  request->send(SPIFFS, "/img/favicon.ico", "image/vnd.microsoft.icon");
+  });
 
   //after all requests finally start webserver
   server.begin(); 
@@ -101,6 +105,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   if(type == WS_EVT_CONNECT){
     Serial.printf("%s:JavaScript Event: WS_EVT_CONNECT\n",TAG);
     globalClient = client;
+    display_update(0,(char*)"");
   }
   else if (type == WS_EVT_DATA){
     char webdata[WEB_BUFFER] = "";
@@ -180,10 +185,12 @@ if (0 == strcmp(ptr,"data_keys_abp")){
     Serial.printf("%s:ASK=%s\n",TAG,web_ASK);
     Serial.printf("%s:DEVADDR=%s\n",TAG,web_DEVADDR);
   #endif
+  display_update(1,(char*)"ABP");
   lora_setabpkeys(web_NSK_char, web_ASK_char, &web_DEVADDR_int);
 }
 else if (0 == strcmp(ptr,"data_lmic_abp")){
   xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);
+  display_update(2,(char*)"-");
 }
 else if (0 == strcmp(ptr,"data_lmic_otaa")){
   //xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, NULL, 1);

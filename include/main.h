@@ -8,9 +8,11 @@
 // config file
 // change setting there
 #include "conf.h"
+
+//header files of components
 #include "lorawan.h"
 #include "code.h"
 #include "webserver.h"
-#include "webpage.h"
+#include "display.h"
 
 #endif

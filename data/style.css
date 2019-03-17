@@ -18,7 +18,7 @@
 	grid-template-columns: 85% 15%;
 	grid-template-areas:  
     "header-float-left header-float-right";
-	background-color:#7D8891;
+	background-color:rgb(134, 133, 133);
 	align-items: center;
 }
 
