@@ -170,7 +170,7 @@ void lora_initialize(void * parameter){
 
     // define additional channels
     
-    LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
+    /*LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
     LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI);      // g-band
     LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
     LMIC_setupChannel(3, 867100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
@@ -179,6 +179,7 @@ void lora_initialize(void * parameter){
     LMIC_setupChannel(6, 867700000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
     LMIC_setupChannel(7, 867900000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
     LMIC_setupChannel(8, 868800000, DR_RANGE_MAP(DR_FSK,  DR_FSK),  BAND_MILLI);      // g2-band
+    */
     
     // Disable link check validation
     LMIC_setLinkCheckMode(0);
@@ -211,7 +212,7 @@ void lora_initialize(void * parameter){
     wifi_setlog("LMIC Bibliothek initialisiert");
 
     //determin how long the process shall be blocked every loop cycle
-    const TickType_t xDelay = 1 / portTICK_PERIOD_MS;
+    const TickType_t xDelay = 2 / portTICK_PERIOD_MS;
 
     for (;;) {
         os_runloop_once();
@@ -224,7 +225,7 @@ void lora_send(osjob_t *job) {
   MessageBuffer_t SendBuffer;
   // Check if there is a pending TX/RX job running, if yes don't eat data
   // since it cannot be sent right now
-  if ((LMIC.opmode & (OP_JOINING | OP_REJOIN | OP_TXDATA | OP_POLL)) != 0) {
+  if (LMIC.opmode & OP_TXRXPEND) {
     // waiting for LoRa getting ready
     #if LOG_LEVEL > 1
         Serial.printf("%s:OP_TXRXPEND, could not send data to LoRa Gateway. LMIC is busy\n", TAG);
@@ -376,9 +377,17 @@ void onEvent(ev_t ev) {
             wifi_setlog("Event empfangen: Link am Leben");
             display_update(2,(char*)"EV_LINK_ALIVE");
             break;
+        case EV_TXSTART:
+            #if LOG_LEVEL > 2
+                Serial.printf("%s:Event is EV_TXSTART\n", TAG);
+            #endif
+            wifi_setlog("Event empfangen: TX begonnen");
+            display_update(2,(char*)"EV_TXSTART");
+            break;
          default:
             #if LOG_LEVEL > 2
-                Serial.printf("%s:Event is unknown\n", TAG);
+                Serial.printf("%s:Event is unknown: ", TAG);
+                Serial.println((unsigned) ev);
             #endif
             wifi_setlog("Unbekanntes Event empfangen");
             display_update(2,(char*)"UNKNOWN");
