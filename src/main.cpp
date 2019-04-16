@@ -30,6 +30,9 @@ Serial.printf("%s:Debugging Level is set to: %i\n",TAG, LOG_LEVEL);
 Serial.printf("%s:Currently running %s in version %s\n",TAG, ESPNAME, PROGVERSION);
 #endif
 
+//hardware setup
+hardware_init();
+
 //wifi setup
 wifi_initialize();
 

@@ -207,6 +207,7 @@ void lora_initialize(void * parameter){
     }
 
     updateWebpage("data_state_lmic;Initialisiert");
+    setLEDs(3,false);
     //call lora_send once to enable scheduled data transfer
     lora_send(&sendjob);
     wifi_setlog("LMIC Bibliothek initialisiert");

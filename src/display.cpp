@@ -33,6 +33,7 @@ void display_initialize(){
     #if LOG_LEVEL > 2
         Serial.printf("%s: Display initialized\n",TAG);
     #endif
+    setLEDs(1,true);
 }
 
 void display_update(int display_mode, char data[15]){
@@ -48,12 +49,17 @@ void display_update(int display_mode, char data[15]){
             u8x8.drawString(0, 2, "1. Keys setzen");
             u8x8.drawString(0, 3, "2. LMIC laden");
             u8x8.drawString(0, 4, "3. Daten senden");
+            setLEDs(1,false);
+            setLEDs(2,true);
             break;
         //keys set
         case 1:
             u8x8.drawString(0, 0, "Modus:");
             u8x8.drawString(0, 1, (char*)data);
             u8x8.drawString(0, 3, "-> LMIC laden");
+            setLEDs(1,false);
+            setLEDs(2,false);
+            setLEDs(3,true);
             break;
         //lmic loaded, ready to send
         case 2:
