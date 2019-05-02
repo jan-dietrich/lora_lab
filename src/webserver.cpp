@@ -10,7 +10,7 @@ const char *password = WIFI_PASSWD;
 AsyncWebServer server(80);
 
 //data that is send to lora
-uint8_t mydata[] = "Hello, world!";
+uint8_t dummydata[] = "Hello, world!";
 
 //handle for RTOS LMIC task
 TaskHandle_t pvLMICTask = NULL;
@@ -95,12 +95,6 @@ void wifi_initialize(){
   //after all requests finally start webserver
   server.begin(); 
   wifi_setlog("Webserver gestartet");
-
-  //prepare data for LoRa
-  SendBuffer.MessageSize = sizeof(mydata)-1;
-  SendBuffer.MessagePort = 1;
-  memcpy(SendBuffer.Message, mydata, SendBuffer.MessageSize);
-
 }
 
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
@@ -246,10 +240,19 @@ else if (0 == strcmp(ptr,"data_lmic_otaa")){
   xTaskCreatePinnedToCore(lora_initialize, "lora_initialize", 4096, NULL, 5, &pvLMICTask, 1);
 }
 else if (0 == strcmp(ptr,"data_send")){
-  //prepare data for LoRa
-	SendBuffer.MessageSize = sizeof(mydata) - 1;
-	SendBuffer.MessagePort = 1;
-	memcpy(SendBuffer.Message, mydata, SendBuffer.MessageSize);
+  char* decode = strtok(NULL, ";");
+  if (0 == strcmp(decode,"sendDataDummyButton")){
+    //prepare data for LoRa
+	  SendBuffer.MessageSize = sizeof(dummydata) - 1;
+	  SendBuffer.MessagePort = 1;
+	  memcpy(SendBuffer.Message, dummydata, SendBuffer.MessageSize);
+  }
+  else if (0 == strcmp(decode,"sendDataTempButton")){
+    
+  }
+  else if (0 == strcmp(decode,"sendDataBTNButton")){
+    
+  }
 
   lora_enqueuedata(&SendBuffer);
 }

@@ -33,7 +33,9 @@
          }
          function LMICABP(){ws.send("data_lmic_abp");}
          function LMICOTAA(){ws.send("data_lmic_otaa");}
-         function sendData(){ws.send("data_send");}
+         function sendData(evt){
+            var data = "data_send;" + evt + ";";
+            ws.send(data); }
          function LMICReset(){ws.send("data_lmic_reset");}
          function setDecode(evt){
             var data = "data_decode;" + evt + ";";

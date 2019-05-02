@@ -1,7 +1,14 @@
 <link rel="stylesheet" href="style.css">
 <div class="content_page">
     <h1>Daten</h1>
-    <important>Es muss ein Downlink von TTN erfolgen! Sonst h&aumlngt sich LMIC auf</important><br />
+    <h2>Daten senden</h2>
     Falls der Zustand TXRXPEND eintritt (LMIC noch busy), muss der Programmstack zur&uumlckgesetzt werden<br />
-    <button class="button" onclick="sendData()" id="sendDataButton">Daten an TTN senden</button>
+    <button class="button" onclick="sendData(id)" id="sendDataDummyButton">Dummy Daten</button>
+    <button class="button" onclick="sendData(id)" id="sendDataTempButton">Temperatur</button>
+    <button class="button" onclick="sendData(id)" id="sendDataBTNButton">Taster</button>
+    <br />
+    <h2>Daten empfangen</h2>
+    <button class="button" onclick="setDecode(id)" id="setDecodeRaw">Rohdaten</button>
+    <button class="button" onclick="setDecode(id)" id="setDecodeASCII">ASCII</button>
+    <button class="button" onclick="setDecode(id)" id="setDecodeLED">LED Daten</button>
 </div>

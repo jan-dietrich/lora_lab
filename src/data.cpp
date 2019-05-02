@@ -19,6 +19,16 @@ void hardware_init(){
     pinMode(PIN_LED_R, OUTPUT);
     pinMode(PIN_LED_G, OUTPUT);
     pinMode(PIN_LED_Y, OUTPUT);
+
+    //prepare the button pins
+    pinMode(PIN_BTN_1, INPUT);
+    pinMode(PIN_BTN_2, INPUT);
+    pinMode(PIN_BTN_3, INPUT);
+
+    //attach interrupts to buttons
+    attachInterrupt(digitalPinToInterrupt(PIN_BTN_1), isr_btn_1, LOW);
+    attachInterrupt(digitalPinToInterrupt(PIN_BTN_2), isr_btn_2, LOW);
+    attachInterrupt(digitalPinToInterrupt(PIN_BTN_3), isr_btn_3, LOW);
 }
 
 void setLEDs(int i, bool val){
@@ -40,3 +50,8 @@ void setLEDs(int i, bool val){
             break;
     }
 }
+
+//interrupt routines
+void isr_btn_1(){}
+void isr_btn_2(){}
+void isr_btn_3(){}

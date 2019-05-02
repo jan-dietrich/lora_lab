@@ -21,4 +21,9 @@ void hardware_init();
 //method to set the boar leds
 void setLEDs(int i, bool val);
 
+//interrupt routines
+void isr_btn_1();
+void isr_btn_2();
+void isr_btn_3();
+
 #endif
