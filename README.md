@@ -28,4 +28,11 @@ This will only be valid if using PlatformIO
 
 ### Usage
 This chapter gives an overview about how to use the lora_lab board
-- tbc
+- Connect to a USB power source. The red LED should bright up and the display shows SSID as well as password of the WiFi Access Point
+- Connect to the WiFi and navigate to the IP address displayed 
+- The yellow LED should bright up. Now navigate to “Zugangsdaten” and enter the TTN access keys. If you want to connect via ABP you can copy all keys as they are. If you want to connect via OTAA you need to pay attention to the endianness of the key. DevEUI and AppEUI must be LSB! Therefore, change the setting in the TTN console to LSB. Furthermore, you must eliminate needless characters manually so that the looks like DDBBCCAA. This is necessary due to internal handling of the keys. The Appkey can be copied as it is. It is recommended to save the keys somewhere
+- The green LED should light up. Navigate to “LMIC” and start the program stack in the correct mode. If using OTAA the joining procedure will start
+- To send data to TTN navigate to “Data” and select the desired one (at the moment only Dummy Data is implemented!)
+- If you want to change the spreading factor go to “Parameter” (not implemented yet!)
+- To reset the LMIC stack go to “LMIC” or press the reset button on the board
+- Sometimes performance problems occur that cause the board to crash. In this case begin with the first point in this list again 
