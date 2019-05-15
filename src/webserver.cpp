@@ -246,15 +246,23 @@ else if (0 == strcmp(ptr,"data_send")){
 	  SendBuffer.MessageSize = sizeof(dummydata) - 1;
 	  SendBuffer.MessagePort = 1;
 	  memcpy(SendBuffer.Message, dummydata, SendBuffer.MessageSize);
+    enable_btns(false);
+    lora_enqueuedata(&SendBuffer);
   }
   else if (0 == strcmp(decode,"sendDataTempButton")){
-    
+    int temp_data = read_temperature();
+    //prepare data for LoRa
+	  SendBuffer.MessageSize = sizeof(temp_data) - 1;
+	  SendBuffer.MessagePort = 1;
+	  memcpy(SendBuffer.Message, &temp_data, SendBuffer.MessageSize);
+    enable_btns(false);
+    lora_enqueuedata(&SendBuffer);
   }
   else if (0 == strcmp(decode,"sendDataBTNButton")){
-    
+    enable_btns(true);
   }
 
-  lora_enqueuedata(&SendBuffer);
+ 
 }
 else if (0 == strcmp(ptr,"data_lmic_reset")){
   if( pvLMICTask != NULL )
@@ -277,5 +285,6 @@ else if (0 == strcmp(ptr,"data_decode")){
   char* decode = strtok(NULL, ";");
   if (0 == strcmp(decode,"setDecodeRaw")){set_decode_mode(0);}
   else if (0 == strcmp(decode,"setDecodeASCII")){set_decode_mode(1);}
+  else if (0 == strcmp(decode, "setDecodeLED")){set_decode_mode(2);}
 }
 }

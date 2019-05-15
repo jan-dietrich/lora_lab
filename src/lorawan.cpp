@@ -167,19 +167,6 @@ void lora_initialize(void * parameter){
     #endif
     }
     }
-
-    // define additional channels
-    
-    /*LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-    LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI);      // g-band
-    LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-    LMIC_setupChannel(3, 867100000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-    LMIC_setupChannel(4, 867300000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-    LMIC_setupChannel(5, 867500000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-    LMIC_setupChannel(6, 867700000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-    LMIC_setupChannel(7, 867900000, DR_RANGE_MAP(DR_SF12, DR_SF7),  BAND_CENTI);      // g-band
-    LMIC_setupChannel(8, 868800000, DR_RANGE_MAP(DR_FSK,  DR_FSK),  BAND_MILLI);      // g2-band
-    */
     
     // Disable link check validation
     LMIC_setLinkCheckMode(0);
@@ -240,6 +227,7 @@ void lora_send(osjob_t *job) {
     #endif
     if (xQueueReceive(LoraSendQueue, &SendBuffer, (TickType_t)0) == pdTRUE) {
       // SendBuffer now filled with next payload from queue
+      LMIC_clrTxData(); //clear data that is still in buffer
       LMIC_setTxData2(SendBuffer.MessagePort, SendBuffer.Message, SendBuffer.MessageSize, 0);
       wifi_setlog("Warteschlange an TTN gesendet");
         #if LOG_LEVEL > 2
@@ -337,10 +325,10 @@ void onEvent(ev_t ev) {
                     Serial.printf("%s:Received ",TAG);
                     Serial.printf("%d",LMIC.dataLen);
                     Serial.printf(" byte(s) of payload, RSSI %d SNR %d\n", LMIC.rssi, LMIC.snr);
+                    decode_message(LMIC.frame + LMIC.dataBeg, LMIC.dataLen);
                 }
             #endif
             wifi_setlog("Event empfangen: TX abgeschlossen (einschließlich warten auf RX Fenster)");
-            decode_message(LMIC.frame + LMIC.dataBeg, LMIC.dataLen);
             display_update(2,(char*)"EV_TXCOMPLETE");
             break;
         case EV_LOST_TSYNC: 
@@ -396,19 +384,21 @@ void onEvent(ev_t ev) {
     }
 }
 
-void lora_enqueuedata(MessageBuffer_t *message) {
+void lora_enqueuedata(MessageBuffer_t *message, int isr) {
   // enqueue message in LORA send queue
   BaseType_t ret;
     ret = xQueueSendToBack(LoraSendQueue, (void *)message, (TickType_t)0);
 
   if (ret == pdTRUE) {
       #if LOG_LEVEL > 2
-      Serial.printf("%s:%d bytes enqueued for LORA interface\n", TAG, message->MessageSize);
+      Serial.printf("%s: %d bytes enqueued for LORA interface\n", TAG, message->MessageSize);
       #endif
+      if (isr == 0){
       wifi_setlog("Daten zur Warteschlange hinzugef&uumlgt");
+      }
   } else {
       #if LOG_LEVEL > 1
-      Serial.printf("%s:LoRa sendque is full\n", TAG);
+      Serial.printf("%s:nLoRa sendque is full\n", TAG);
       #endif
   }
 }

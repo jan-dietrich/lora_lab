@@ -36,6 +36,6 @@ void onEvent(ev_t ev);
 void lora_send(osjob_t* j);
 
 //enque data into uplink que
-void lora_enqueuedata(MessageBuffer_t *message);
+void lora_enqueuedata(MessageBuffer_t *message, int isr =0);
 
 #endif

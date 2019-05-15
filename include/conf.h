@@ -28,17 +28,18 @@
 #define LORA_DIO2                       32
 
 // LoRa TX interval in seconds. Needs to be compliant to fair use policy. May become longer due to duty cycle restrictions
-#define TX_INTERVAL                     30 
+#define TX_INTERVAL                     45 
 
 #define PAYLOAD_BUFFER_SIZE             50      // maximum size of payload block per transmit
 #define SEND_QUEUE_SIZE                 10      // maximum number of messages in payload send queue [1 = no queue]
 #define SEND_BUFFER_SIZE                50      // size of sendbuffer
-#define MAX_CLOCK_ERROR_PERCENTAGE      7       // determins the allowed clock error (shall be < 7)
+#define MAX_CLOCK_ERROR_PERCENTAGE      2       // determins the allowed clock error (shall be < 7)
 
-// WiFi config
+// WiFi config 
+// The SSID and password must not be longer than 10 characters!
 #define WIFI_SSID                       "Test_WiFi"
 #define WIFI_PASSWD                     "12345678"
 
 #define MAX_LOG_NUMBER                  5       // number of log entries
-#define WEB_BUFFER                      1000     // number of bytes that the webserver buffer is long
+#define WEB_BUFFER                      1000    // number of bytes that the webserver buffer is long
 #endif

@@ -53,6 +53,26 @@ switch (decodeMode)
     for(int icoursor = 0; icoursor < datalength; icoursor ++){
         wifi_output += char(data[icoursor]); 
     }
+
+    case 2: 
+    switch (data[0]){
+        case 0: 
+            setLEDs(1,false);
+            setLEDs(2,false);
+            setLEDs(3,false);
+        case 1: 
+            setLEDs(1,true);
+            setLEDs(2,false);
+            setLEDs(3,false);
+        case 2: 
+            setLEDs(1,false);
+            setLEDs(2,true);
+            setLEDs(3,false);
+        case 3: 
+            setLEDs(1,false);
+            setLEDs(2,false);
+            setLEDs(3,true);
+    }
     break;
 
     default:
