@@ -33,7 +33,7 @@
 #define PAYLOAD_BUFFER_SIZE             50      // maximum size of payload block per transmit
 #define SEND_QUEUE_SIZE                 10      // maximum number of messages in payload send queue [1 = no queue]
 #define SEND_BUFFER_SIZE                50      // size of sendbuffer
-#define MAX_CLOCK_ERROR_PERCENTAGE      2       // determins the allowed clock error (shall be < 7)
+#define MAX_CLOCK_ERROR_PERCENTAGE      3       // determins the allowed clock error (shall be < 7)
 
 // WiFi config 
 // The SSID and password must not be longer than 10 characters!

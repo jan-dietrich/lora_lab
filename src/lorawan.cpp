@@ -17,6 +17,9 @@
 // Local logging Tag
 static const char TAG[] = "lora";
 
+//for wifi log
+String slog;
+
 static osjob_t sendjob;
 QueueHandle_t LoraSendQueue;
 MessageBuffer_t SendBuffer; // contains MessageSize, MessagePort, Message[]
@@ -216,8 +219,8 @@ void lora_send(osjob_t *job) {
   if (LMIC.opmode & OP_TXRXPEND) {
     // waiting for LoRa getting ready
     #if LOG_LEVEL > 1
-        Serial.printf("%s:OP_TXRXPEND, could not send data to LoRa Gateway. LMIC is busy\n", TAG);
-        Serial.printf("%s:Opcode is: %x\n", TAG, LMIC.opmode);
+        Serial.printf("%s: OP_TXRXPEND, could not send data to LoRa Gateway. LMIC is busy\n", TAG);
+        Serial.printf("%s: Opcode is: %x\n", TAG, LMIC.opmode);
     #endif
     wifi_setlog("Daten konnten nicht gesendet werden, da LMIC noch arbeitet");
     display_update(2,(char*)"TXRXPEND -> RST");
@@ -317,18 +320,22 @@ void onEvent(ev_t ev) {
             display_update(2,(char*)"EV_REJOIN_FAILED");
             break;
         case EV_TXCOMPLETE: 
+            slog = (String)LMIC.dataLen + " Bytes empfangen";
+            wifi_setlog(slog);
+            slog = "RSSI: " + (String)LMIC.rssi + " SNR: " + (String)LMIC.snr;
+            wifi_setlog(slog);
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is EV_TXCOMPLETE (includes waiting for RX windows)\n", TAG);
                 if (LMIC.txrxFlags & TXRX_ACK)
                     Serial.printf("%s:Received ack\n",TAG);
+                Serial.printf("%s:Received ",TAG);
+                Serial.printf("%d",LMIC.dataLen);
+                Serial.printf(" byte(s) of payload, RSSI %d SNR %d\n", LMIC.rssi, LMIC.snr);
                 if (LMIC.dataLen) { //if valid data is received
-                    Serial.printf("%s:Received ",TAG);
-                    Serial.printf("%d",LMIC.dataLen);
-                    Serial.printf(" byte(s) of payload, RSSI %d SNR %d\n", LMIC.rssi, LMIC.snr);
                     decode_message(LMIC.frame + LMIC.dataBeg, LMIC.dataLen);
                 }
             #endif
-            wifi_setlog("Event empfangen: TX abgeschlossen (einschließlich warten auf RX Fenster)");
+            wifi_setlog("Event empfangen: TX abgeschlossen");
             display_update(2,(char*)"EV_TXCOMPLETE");
             break;
         case EV_LOST_TSYNC: 
@@ -372,7 +379,7 @@ void onEvent(ev_t ev) {
             #endif
             wifi_setlog("Event empfangen: TX begonnen");
             display_update(2,(char*)"EV_TXSTART");
-            break;
+            break; 
          default:
             #if LOG_LEVEL > 2
                 Serial.printf("%s:Event is unknown: ", TAG);
@@ -400,5 +407,54 @@ void lora_enqueuedata(MessageBuffer_t *message, int isr) {
       #if LOG_LEVEL > 1
       Serial.printf("%s:nLoRa sendque is full\n", TAG);
       #endif
+  }
+}
+
+// helper function to assign LoRa datarates to numeric spreadfactor values
+void switch_sf(uint8_t sf) {
+uint8_t tx = 14;  
+#if LOG_LEVEL > 2
+    Serial.printf("%s: Switched SF to ", TAG);
+    Serial.println(sf);
+#endif
+slog = "Speizfaktor gesetzt: " + (String)sf;
+wifi_setlog(slog);
+slog = "data_state_sf;SF" + sf;
+updateWebpage(slog);
+
+switch (sf) {
+    case 7:
+        LMIC_setDrTxpow(DR_SF7, tx);
+    break;
+    case 8:
+        LMIC_setDrTxpow(DR_SF8, tx);
+    break;
+    case 9:
+        LMIC_setDrTxpow(DR_SF9, tx);
+    break;
+    case 10:
+        LMIC_setDrTxpow(DR_SF10, tx);
+    break;
+    case 11:
+        #if defined(CFG_us915)
+        LMIC_setDrTxpow(DR_SF11CR, tx);
+    break;
+        #else
+        LMIC_setDrTxpow(DR_SF11, tx);
+    break;
+        #endif
+    case 12:
+        #if defined(CFG_us915)
+        LMIC_setDrTxpow(DR_SF12CR, tx);
+    break;
+        #else
+        LMIC_setDrTxpow(DR_SF12, tx);
+    break;
+        #endif
+    default:
+        #if LOG_LEVEL > 0
+            Serial.printf("%s: Invalid SF chosen!",TAG);
+        #endif
+    break;
   }
 }

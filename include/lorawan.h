@@ -38,4 +38,7 @@ void lora_send(osjob_t* j);
 //enque data into uplink que
 void lora_enqueuedata(MessageBuffer_t *message, int isr =0);
 
+//change spreading factor
+void switch_sf(uint8_t sf);
+
 #endif

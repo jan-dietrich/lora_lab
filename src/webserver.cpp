@@ -287,4 +287,13 @@ else if (0 == strcmp(ptr,"data_decode")){
   else if (0 == strcmp(decode,"setDecodeASCII")){set_decode_mode(1);}
   else if (0 == strcmp(decode, "setDecodeLED")){set_decode_mode(2);}
 }
+else if (0 == strcmp(ptr,"data_sf")){
+  char* decode = strtok(NULL, ";");
+  if (0 == strcmp(decode,"setSF7Button")){switch_sf(7);}
+  else if (0 == strcmp(decode,"setSF8Button")){switch_sf(8);}
+  else if (0 == strcmp(decode,"setSF9Button")){switch_sf(9);}
+  else if (0 == strcmp(decode,"setSF10Button")){switch_sf(10);}
+  else if (0 == strcmp(decode,"setSF11Button")){switch_sf(11);}
+  else if (0 == strcmp(decode,"setSF12Button")){switch_sf(12);}
+}
 }
